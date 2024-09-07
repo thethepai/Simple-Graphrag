@@ -1,0 +1,9 @@
+*.txt
+*.xlsx
+*.xls
+*.csv
+*.env
+*.yaml
+/ragtest/
+/examples-notebooks/
+/data/
