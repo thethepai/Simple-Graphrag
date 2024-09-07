@@ -11,6 +11,7 @@ graphrag = "^0.3.2"
 pandas = "^2.2.2"
 openpyxl = "^3.1.5"
 ipykernel = "^6.29.5"
+yfiles-jupyter-graphs = "^1.8.1"
 
 
 [tool.poetry.group.dev.dependencies]

@@ -62,4 +62,4 @@ if __name__ == "__main__":
 
     client = RagClientInit(root_path, config_path, output_path)
     # client.initialize_graphrag()
-    client.initialize_index()
+    # client.initialize_index()
