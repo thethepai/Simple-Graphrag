@@ -22,13 +22,13 @@ class RagClientInit:
                 init=True,
                 verbose=False,
                 resume=None,
+                update_index_id=False,
                 memprofile=False,
                 nocache=False,
                 reporter=None,
-                config=None,
+                config_filepath=None,
                 emit=None,
                 dryrun=False,
-                overlay_defaults=False,
                 skip_validations=False,
             )
             self.create_input_folder()
@@ -43,13 +43,13 @@ class RagClientInit:
             init=False,
             verbose=False,
             resume=None,
+            update_index_id=False,
             memprofile=False,
             nocache=False,
             reporter=None,
-            config=None,
+            config_filepath=None,
             emit=None,
             dryrun=False,
-            overlay_defaults=False,
             skip_validations=False,
         )
 
