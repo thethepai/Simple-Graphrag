@@ -4,9 +4,10 @@ version = "0.1.0"
 description = "read doc using graph-rag"
 authors = ["thethepai <u202112003@hust.edu.cn>"]
 readme = "README.md"
+package-mode = false
 
 [tool.poetry.dependencies]
-python = ">=3.10,<3.12"
+python = ">=3.10,<3.13"
 graphrag = "^0.3.2"
 pandas = "^2.2.2"
 openpyxl = "^3.1.5"
