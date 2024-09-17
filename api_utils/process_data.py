@@ -81,9 +81,9 @@ class CSVToTextConverter:
 
 
 if __name__ == "__main__":
-    excel_file_path = "./data/table-csv/input-table/example.xlsx"
-    output_dir = "./data/table-csv"
-    result_file = "./data/table-csv/combined/combined.txt"
+    excel_file_path = "./data/input_table/example.xlsx"
+    output_dir = "./data/table_csv"
+    result_file = "./data/combined/combined.txt"
     columns_to_process = [1, 2]
 
     if os.path.exists(excel_file_path):

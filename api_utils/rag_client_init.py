@@ -1,5 +1,6 @@
 import os
 from index_api import CommandRunner, IndexingRequest, PromptTuneRequest
+from config import YamlManager, DotenvManager
 
 class RagClientInit:
     def __init__(self):
@@ -12,7 +13,7 @@ class RagClientInit:
 
         if os.path.exists(request_index.root):
             print(f"创建了{request_index.root}文件夹")
-            input_folder = os.path.join(request_index.root, "input")
+            input_folder = os.path.join(request_index.root, "input") # default folder name in graphrag
             if not os.path.exists(input_folder):
                 os.makedirs(input_folder)
                 print(f"创建了{input_folder}文件夹")
@@ -23,24 +24,63 @@ class RagClientInit:
         print("STDOUT:", stdout)
         print("STDERR:", stderr)
 
-if __name__ == "__main__":
-    request_index = IndexingRequest(root="./ragtest")
-    request_prompt_tune = PromptTuneRequest(
-        root="/path/to/project",
-        config="/path/to/settings.yaml",
-        domain="environmental news",
-        method="random",
-        limit=10,
-        language="Chinese",
-        max_tokens=2048,
-        chunk_size=256,
-        min_examples_required=3,
-        no_entity_types=True,
-        output="/path/to/output"
-    )
+    def initialize_config(self, user_config_path, env_config_path, yaml_config_path):
+        env_manager = DotenvManager(user_config_path)
+        yaml_manager = YamlManager(yaml_config_path)
 
-    client = RagClientInit()
-    # client.initialize_indexing(request_index)
-    # client.initialize_prompt_tune(request_prompt_tune)
+        user_config = env_manager.read_env()
+        yaml_config = yaml_manager.read_yaml()
+
+        env_manager = DotenvManager(env_config_path)
+        api_key = user_config.get('GRAPHRAG_API_KEY')
+        api_key_config = {'GRAPHRAG_API_KEY': api_key}
+        env_manager.write_env(api_key_config)
+        
+        yaml_config['embeddings']['llm']['api_base'] = user_config.get('API_BASE', yaml_config['embeddings']['llm'].get('api_base'))
+        yaml_config['llm']['api_base'] = user_config.get('API_BASE', yaml_config['llm'].get('api_base'))
+        yaml_config['llm']['model'] = user_config.get('MODEL_ID', yaml_config['llm'].get('model'))
+        yaml_config['embeddings']['llm']['model'] = user_config.get('EMBEDDING_MODEL_ID', yaml_config['embeddings']['llm'].get('model'))
+        
+        if user_config.get('CLAIM_EXTRACTION') == 'True':
+            yaml_config['claim_extraction']['enabled'] = True
+        yaml_manager.write_yaml(yaml_config)
+
+
+class InitPipeline:
+    @classmethod
+    def default_init(cls):
+        request_index = IndexingRequest(root="./ragtest")
+        client = RagClientInit()
+        client.initialize_indexing(request_index)
+
+    @classmethod
+    def default_config(cls):
+        user_config_path = ".env"
+        env_config_path = "./ragtest/.env"
+        yaml_config_path = "./ragtest/settings.yaml"
+        client = RagClientInit()
+        client.initialize_config(user_config_path, env_config_path, yaml_config_path)
+
+    @classmethod
+    def default_prompt_tune(cls):
+        request_prompt_tune = PromptTuneRequest(
+            root="./ragtest",
+            config="./ragtest/settings.yaml",
+            domain="Cybersecurity Syllabus",
+            method="random",
+            limit=15,
+            language="Chinese",
+            max_tokens=2048,
+            chunk_size=256,
+            min_examples_required=3,
+            no_entity_types=True,
+            output="./ragtest/prompts"
+        )
+        client = RagClientInit()
+        client.initialize_prompt_tune(request_prompt_tune)
+
+if __name__ == "__main__":
+    # InitPipeline.default_init()
+    InitPipeline.default_config()
 
     
