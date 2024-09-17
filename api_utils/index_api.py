@@ -4,6 +4,7 @@ from typing import Optional
 from pydantic import BaseModel
 import gc
 
+
 class IndexingRequest(BaseModel):
     root: str
     init: bool = True
@@ -48,7 +49,7 @@ class CommandRunner:
         with cls._lock:
             cls._instance = None
             gc.collect()
-    
+
     def run_indexing_command_default(self, request: IndexingRequest):
         command = [
             "poetry", "run", "poe", "index",
@@ -75,7 +76,7 @@ class CommandRunner:
         if not result.stderr:
             result.stderr = "none"
         return result.stdout, result.stderr
-    
+
     def run_prompt_tune_command_default(self, request: PromptTuneRequest):
         command = [
             "poetry", "run", "poe", "prompt_tune",
@@ -89,7 +90,7 @@ class CommandRunner:
         if not result.stderr:
             result.stderr = "none"
         return result.stdout, result.stderr
-    
+
     def run_prompt_tune_command(self, request: PromptTuneRequest):
         command = [
             "poetry", "run", "poe", "prompt_tune",
@@ -108,7 +109,7 @@ class CommandRunner:
         if not result.stderr:
             result.stderr = "none"
         return result.stdout, result.stderr
-    
+
 
 # Example usage
 if __name__ == "__main__":
