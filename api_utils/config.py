@@ -73,6 +73,8 @@ def yaml_test():
     if 'embeddings' in config:
         config['embeddings']['llm']['model'] = 'embedding-3'
         config['embeddings']['llm']['api_base'] = 'your_api_base_value'
+    if 'claim_extraxtion' in config:
+        config['claim_extraction']['enabled'] = 'true'
     
     # Writing the updated configuration back to the YAML file
     yaml_manager.write_yaml(config)
