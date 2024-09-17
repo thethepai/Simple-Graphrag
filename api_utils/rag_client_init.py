@@ -1,5 +1,5 @@
 import os
-from index_api import CommandRunner
+from index_api import CommandRunner, IndexingRequest, PromptTuneRequest
 
 class RagClientInit:
     def __init__(self):
@@ -24,8 +24,6 @@ class RagClientInit:
         print("STDERR:", stderr)
 
 if __name__ == "__main__":
-    from index_api import IndexingRequest, PromptTuneRequest
-
     request_index = IndexingRequest(root="./ragtest")
     request_prompt_tune = PromptTuneRequest(
         root="/path/to/project",
@@ -42,5 +40,7 @@ if __name__ == "__main__":
     )
 
     client = RagClientInit()
-    client.initialize_indexing(request_index)
+    # client.initialize_indexing(request_index)
     # client.initialize_prompt_tune(request_prompt_tune)
+
+    

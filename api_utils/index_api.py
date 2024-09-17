@@ -83,6 +83,8 @@ class CommandRunner:
         ]
         command = [arg for arg in command if arg]  # Remove empty strings
         result = subprocess.run(command, capture_output=True, text=True)
+        if not result.stderr:
+            result.stderr = "none"
         return result.stdout, result.stderr
     
     def run_prompt_tune_command(self, request: PromptTuneRequest):
@@ -102,6 +104,8 @@ class CommandRunner:
         ]
         command = [arg for arg in command if arg]  # Remove empty strings
         result = subprocess.run(command, capture_output=True, text=True)
+        if not result.stderr:
+            result.stderr = "none"
         return result.stdout, result.stderr
     
 
