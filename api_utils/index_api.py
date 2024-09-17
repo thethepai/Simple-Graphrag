@@ -23,7 +23,6 @@ class PromptTuneRequest(BaseModel):
     root: str
     config: str
     domain: Optional[str] = None
-    method: str = "random"
     limit: int = 15
     language: Optional[str] = None
     max_tokens: int = 2048
@@ -97,12 +96,10 @@ class CommandRunner:
             "--root", request.root,
             "--config", request.config,
             "--domain", request.domain,
-            "--method", request.method,
             "--limit", str(request.limit),
             "--language", request.language,
             "--max-tokens", str(request.max_tokens),
             "--chunk-size", str(request.chunk_size),
-            "--min-examples-required", str(request.min_examples_required),
             "--no-entity-types" if request.no_entity_types else "",
             "--output", request.output
         ]

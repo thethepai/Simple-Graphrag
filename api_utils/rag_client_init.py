@@ -47,19 +47,19 @@ class RagClientInit:
 
 
 class InitPipeline:
+    client = RagClientInit()  # load instance once
+
     @classmethod
     def default_init(cls):
         request_index = IndexingRequest(root="./ragtest")
-        client = RagClientInit()
-        client.initialize_indexing(request_index)
+        cls.client.initialize_indexing(request_index)
 
     @classmethod
     def default_config(cls):
         user_config_path = ".env"
         env_config_path = "./ragtest/.env"
         yaml_config_path = "./ragtest/settings.yaml"
-        client = RagClientInit()
-        client.initialize_config(user_config_path, env_config_path, yaml_config_path)
+        cls.client.initialize_config(user_config_path, env_config_path, yaml_config_path)
 
     @classmethod
     def default_prompt_tune(cls):
@@ -67,20 +67,18 @@ class InitPipeline:
             root="./ragtest",
             config="./ragtest/settings.yaml",
             domain="Cybersecurity Syllabus",
-            method="random",
             limit=15,
             language="Chinese",
             max_tokens=2048,
             chunk_size=256,
-            min_examples_required=3,
             no_entity_types=True,
             output="./ragtest/prompts"
         )
-        client = RagClientInit()
-        client.initialize_prompt_tune(request_prompt_tune)
+        cls.client.initialize_prompt_tune(request_prompt_tune)
 
 if __name__ == "__main__":
     # InitPipeline.default_init()
-    InitPipeline.default_config()
+    # InitPipeline.default_config()
+    InitPipeline.default_prompt_tune()
 
     
