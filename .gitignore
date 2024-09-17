@@ -4,6 +4,7 @@
 *.csv
 *.env
 *.yaml
+*.pyc
 /ragtest/
 /graphrag-files/
 /examples-notebooks/
