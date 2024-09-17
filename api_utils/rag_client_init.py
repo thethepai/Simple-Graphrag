@@ -1,6 +1,6 @@
 import os
 from graphrag.index.cli import index_cli
-
+from index_api import IndexingRequest, PromptTuneRequest, CommandRunner
 
 class RagClientInit:
     def __init__(self, root, config, output):
