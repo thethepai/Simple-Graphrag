@@ -58,6 +58,8 @@ class CommandRunner:
         ]
         command = [arg for arg in command if arg]  # Remove empty strings
         result = subprocess.run(command, capture_output=True, text=True)
+        if not result.stderr:
+            result.stderr = "none"
         return result.stdout, result.stderr
 
     def run_indexing_command(self, request: IndexingRequest):
@@ -71,6 +73,8 @@ class CommandRunner:
         ]
         command = [arg for arg in command if arg]  # Remove empty strings
         result = subprocess.run(command, capture_output=True, text=True)
+        if not result.stderr:
+            result.stderr = "none"
         return result.stdout, result.stderr
     
     def run_prompt_tune_command_default(self, request: PromptTuneRequest):
