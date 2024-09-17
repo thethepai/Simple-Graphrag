@@ -103,10 +103,11 @@ class CommandRunner:
         command = [arg for arg in command if arg]  # Remove empty strings
         result = subprocess.run(command, capture_output=True, text=True)
         return result.stdout, result.stderr
+    
 
 # Example usage
 if __name__ == "__main__":
-    requestIndex = IndexingRequest(root="./ragtest")
+    requestIndex = IndexingRequest(root="./ragtest", init=True)
     runner = CommandRunner()
     stdout, stderr = runner.run_indexing_command_default(requestIndex)
     print("STDOUT:", stdout)
