@@ -3,9 +3,12 @@ from threading import Lock
 from typing import Optional
 from pydantic import BaseModel
 
+# config
+from .default_config import ROOT_DIR, CONFIG_FILE_PATH, OUTPUT_DIR
+
 
 class IndexingRequest(BaseModel):
-    root: str
+    root: str = ROOT_DIR
     init: bool = True
     verbose: bool = False
     resume: Optional[str] = None
@@ -20,15 +23,15 @@ class IndexingRequest(BaseModel):
 
 
 class PromptTuneRequest(BaseModel):
-    root: str
-    config: str
+    root: str = ROOT_DIR
+    config: str = CONFIG_FILE_PATH
     domain: Optional[str] = None
     limit: int = 15
     language: Optional[str] = None
     max_tokens: int = 2048
     chunk_size: int = 256
     no_entity_types: bool = True
-    output: str
+    output: str = OUTPUT_DIR
 
 
 class CommandRunner:
@@ -40,9 +43,10 @@ class CommandRunner:
             with cls._lock:
                 if not cls._instance:
                     cls._instance = super(CommandRunner, cls).__new__(
-                        cls, *args, **kwargs)
+                        cls, *args, **kwargs
+                    )
         return cls._instance
-    
+
     @classmethod
     def destroy_instance(cls):
         with cls._lock:
@@ -50,9 +54,13 @@ class CommandRunner:
 
     def run_indexing_command_default(self, request: IndexingRequest):
         command = [
-            "poetry", "run", "poe", "index",
+            "poetry",
+            "run",
+            "poe",
+            "index",
             "--init" if request.init else "",
-            "--root", request.root
+            "--root",
+            request.root,
         ]
         command = [arg for arg in command if arg]  # Remove empty strings
         result = subprocess.run(command, capture_output=True, text=True)
@@ -62,12 +70,19 @@ class CommandRunner:
 
     def run_indexing_command(self, request: IndexingRequest):
         command = [
-            "poetry", "run", "poe", "index",
+            "poetry",
+            "run",
+            "poe",
+            "index",
             "--init" if request.init else "",
-            "--root", request.root,
-            "--config", request.config_filepath,
-            "--resume", request.resume,
-            "--emit", request.emit,
+            "--root",
+            request.root,
+            "--config",
+            request.config_filepath,
+            "--resume",
+            request.resume,
+            "--emit",
+            request.emit,
         ]
         command = [arg for arg in command if arg]  # Remove empty strings
         result = subprocess.run(command, capture_output=True, text=True)
@@ -77,10 +92,16 @@ class CommandRunner:
 
     def run_prompt_tune_command_default(self, request: PromptTuneRequest):
         command = [
-            "poetry", "run", "poe", "prompt_tune",
-            "--root", request.root,
-            "--config", request.config,
-            "--output", request.output,
+            "poetry",
+            "run",
+            "poe",
+            "prompt_tune",
+            "--root",
+            request.root,
+            "--config",
+            request.config,
+            "--output",
+            request.output,
             "--no-entity-types" if request.no_entity_types else "",
         ]
         command = [arg for arg in command if arg]  # Remove empty strings
@@ -91,16 +112,25 @@ class CommandRunner:
 
     def run_prompt_tune_command(self, request: PromptTuneRequest):
         command = [
-            "poetry", "run", "poe", "prompt_tune",
-            "--root", request.root,
-            "--config", request.config,
-            "--domain", request.domain,
-            "--limit", str(request.limit),
-            "--language", request.language,
-            "--max-tokens", str(request.max_tokens),
-            "--chunk-size", str(request.chunk_size),
+            "poetry",
+            "run",
+            "poe",
+            "prompt_tune",
+            "--root",
+            request.root,
+            "--config",
+            request.config,
+            "--domain" if request.domain else "",
+            "--limit",
+            str(request.limit),
+            "--language" if request.language else "",
+            "--max-tokens",
+            str(request.max_tokens),
+            "--chunk-size",
+            str(request.chunk_size),
             "--no-entity-types" if request.no_entity_types else "",
-            "--output", request.output
+            "--output",
+            request.output,
         ]
         command = [arg for arg in command if arg]  # Remove empty strings
         result = subprocess.run(command, capture_output=True, text=True)
@@ -111,25 +141,13 @@ class CommandRunner:
 
 # Example usage
 if __name__ == "__main__":
-    requestIndex = IndexingRequest(root="./ragtest", init=True)
+    requestIndex = IndexingRequest()
     runner = CommandRunner()
     stdout, stderr = runner.run_indexing_command_default(requestIndex)
     print("STDOUT:", stdout)
     print("STDERR:", stderr)
 
-    requestPromptTune = PromptTuneRequest(
-        root="/path/to/project",
-        config="/path/to/settings.yaml",
-        domain="environmental news",
-        method="random",
-        limit=10,
-        language="Chinese",
-        max_tokens=2048,
-        chunk_size=256,
-        min_examples_required=3,
-        no_entity_types=True,
-        output="/path/to/output"
-    )
+    requestPromptTune = PromptTuneRequest()
     stdout, stderr = runner.run_prompt_tune_command(requestPromptTune)
     print("STDOUT:", stdout)
     print("STDERR:", stderr)

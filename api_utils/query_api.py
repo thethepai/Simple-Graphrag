@@ -37,24 +37,13 @@ from graphrag.query.structured_search.local_search.mixed_context import (
 from graphrag.query.structured_search.local_search.search import LocalSearch
 from graphrag.vector_stores.lancedb import LanceDBVectorStore
 
-# model
-API_KEY = "wow, such a long key"
-LLM_MODEL = "glm-4"
-EMBEDDING_MODEL = "embedding-3"
-API_BASE = "https://open.bigmodel.cn/api/paas/v4/"
-
-# parquet files generated from indexing pipeline
-OUTPUT_DATE = "20240917-211927"
-INPUT_DIR = f"./ragtest/output/{OUTPUT_DATE}/artifacts"
-COMMUNITY_REPORT_TABLE = "create_final_community_reports"
-ENTITY_TABLE = "create_final_nodes"
-ENTITY_EMBEDDING_TABLE = "create_final_entities"
-RELATIONSHIP_TABLE = "create_final_relationships"
-COVARIATE_TABLE = "create_final_covariates"
-TEXT_UNIT_TABLE = "create_final_text_units"
-COMMUNITY_LEVEL = 2
-
-LANCEDB_URI = f"{INPUT_DIR}/lancedb"
+# config
+from .default_config import (
+    API_KEY, LLM_MODEL, EMBEDDING_MODEL, 
+    API_BASE, INPUT_DIR, COMMUNITY_REPORT_TABLE, 
+    ENTITY_TABLE, ENTITY_EMBEDDING_TABLE, RELATIONSHIP_TABLE, 
+    COVARIATE_TABLE, TEXT_UNIT_TABLE, COMMUNITY_LEVEL, 
+    LANCEDB_URI)
 
 
 class GlobalSearchRequest(BaseModel):
