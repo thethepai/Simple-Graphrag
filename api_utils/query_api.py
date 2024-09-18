@@ -1,10 +1,16 @@
 
+# general
 import os
 import asyncio
 
 import pandas as pd
 import tiktoken
 
+# data
+from typing import Optional
+from pydantic import BaseModel
+
+# graphrag
 from graphrag.query.structured_search.global_search.community_context import (
     GlobalCommunityContext,
 )
@@ -49,6 +55,31 @@ COMMUNITY_LEVEL = 2
 
 LANCEDB_URI = f"{INPUT_DIR}/lancedb"
 
+
+class GlobalSearchRequest(BaseModel):
+    api_key: str = API_KEY
+    model: str = LLM_MODEL
+    api_base: str = API_BASE
+    input_dir: str = INPUT_DIR
+    entity_table: str = ENTITY_TABLE
+    community_report_table: str = COMMUNITY_REPORT_TABLE
+    entity_embedding_table: str = ENTITY_EMBEDDING_TABLE
+    community_level: int = COMMUNITY_LEVEL
+
+class LocalSearchRequest(BaseModel):
+    api_key: str = API_KEY
+    model: str = LLM_MODEL
+    embedding_model: str = EMBEDDING_MODEL
+    api_base: str = API_BASE
+    input_dir: str = INPUT_DIR
+    lancedb_uri: str = LANCEDB_URI
+    entity_table: str = ENTITY_TABLE
+    community_report_table: str = COMMUNITY_REPORT_TABLE
+    relationship_table: str = RELATIONSHIP_TABLE
+    covariate_table: str = COVARIATE_TABLE
+    entity_embedding_table: str = ENTITY_EMBEDDING_TABLE
+    text_unit_table: str = TEXT_UNIT_TABLE
+    community_level: int = COMMUNITY_LEVEL
 
 class GlobalSearchEngine:
     def __init__(self, api_key, model, api_base, input_dir, entity_table, community_report_table, entity_embedding_table, community_level):
@@ -131,7 +162,6 @@ class GlobalSearchEngine:
         print(result.context_data["reports"])
         print(f"LLM calls: {result.llm_calls}. LLM tokens: {
               result.prompt_tokens}")
-
 
 class LocalSearchEngine:
     def __init__(self, api_key, model, embedding_model, api_base, input_dir, lancedb_uri, entity_table, community_report_table, relationship_table, covariate_table, entity_embedding_table, text_unit_table, community_level):
