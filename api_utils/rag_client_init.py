@@ -5,6 +5,7 @@ from .index_api import (
     IndexingRequest,
     PromptTuneRequest,
 )
+
 from .config import YamlManager, DotenvManager
 from .query_api import (
     GlobalSearchEngine,
@@ -30,6 +31,8 @@ class RagClientInit:
             if not os.path.exists(input_folder):
                 os.makedirs(input_folder)
                 print(f"创建了{input_folder}文件夹")
+        
+        return request_index.root
 
     def initialize_prompt_tune(self, request_prompt_tune):
         stdout, stderr = self.runner.run_prompt_tune_command(request_prompt_tune)
@@ -80,12 +83,14 @@ class RagClientInit:
         return PromptTuneRequest()
 
     def get_config_for_query(
-        self, user_config_path
+        self, user_config_path, root_dir = "./ragtest"
     ) -> Tuple[GlobalSearchRequest, LocalSearchRequest]:
         env_manager = DotenvManager(user_config_path)
         config = env_manager.read_env()
         graphrag_api_key = config.get("GRAPHRAG_API_KEY", None)
-        # TODO: Add more config options
+        
+
+
         return GlobalSearchRequest(api_key=graphrag_api_key), LocalSearchRequest(
             api_key=graphrag_api_key
         )
@@ -93,12 +98,13 @@ class RagClientInit:
 
 # This is a template for initializing the pipeline
 class InitPipeline:
-    client = RagClientInit()  # load instance once
+    client = RagClientInit()
+    root_dir = None
 
     @classmethod
     def default_init(cls):
         request_index = IndexingRequest(root="./ragtest")
-        cls.client.initialize_indexing(request_index)
+        cls.root_dir = cls.client.initialize_indexing(request_index)
 
     @classmethod
     def default_start_index(cls):
@@ -119,9 +125,20 @@ class InitPipeline:
         request_prompt_tune = cls.client.get_config_for_prompt_tune(".env")
         cls.client.initialize_prompt_tune(request_prompt_tune)
 
+    @classmethod
+    def get_query_engines(cls) -> Tuple[GlobalSearchEngine, LocalSearchEngine]:
+        global_request, local_request = cls.client.get_config_for_query(".env", cls.root_dir)
+        global_engine = GlobalSearchEngine(global_request)
+        local_engine = LocalSearchEngine(local_request)
+        return global_engine, local_engine
+
 
 if __name__ == "__main__":
     # InitPipeline.default_init()
     # InitPipeline.default_config()
     # InitPipeline.default_prompt_tune()
+
+    # global_engine, local_engine = InitPipeline.get_query_engines()
+
+    # TODO: test above functions
     print("Done")
