@@ -23,7 +23,6 @@ authors = [
 ]
 readme = "README.md"
 packages = [{ include = "graphrag" }]
-package-mode = false
 
 [tool.poetry.dependencies]
 python = ">=3.10,<3.13"
@@ -107,5 +106,5 @@ build-backend = "poetry_dynamic_versioning.backend"
 index = "python -m graphrag.index"
 query = "python -m graphrag.query"
 prompt_tune = "python -m graphrag.prompt_tune"
-index_init = "python -m graphrag.index --init --root ./ragtest"
-prompt_tune_init = "python -m graphrag.prompt_tune --root /path/to/project --config /path/to/settings.yaml --no-entity-types"
+# index_init = "python -m graphrag.index --init --root ./ragtest"
+# prompt_tune_init = "python -m graphrag.prompt_tune --root /path/to/project --config /path/to/settings.yaml --no-entity-types"
