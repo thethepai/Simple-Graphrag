@@ -5,7 +5,6 @@ from .index_api import (
     IndexingRequest,
     PromptTuneRequest,
 )
-
 from .config import YamlManager, DotenvManager
 from .query_api import (
     GlobalSearchEngine,
@@ -13,6 +12,7 @@ from .query_api import (
     GlobalSearchRequest,
     LocalSearchRequest,
 )
+from .default_config import ROOT_DIR
 
 
 class RagClientInit:
@@ -31,7 +31,7 @@ class RagClientInit:
             if not os.path.exists(input_folder):
                 os.makedirs(input_folder)
                 print(f"创建了{input_folder}文件夹")
-        
+
         return request_index.root
 
     def initialize_prompt_tune(self, request_prompt_tune):
@@ -83,13 +83,16 @@ class RagClientInit:
         return PromptTuneRequest()
 
     def get_config_for_query(
-        self, user_config_path, root_dir = "./ragtest"
+        self, user_config_path, root_dir=ROOT_DIR
     ) -> Tuple[GlobalSearchRequest, LocalSearchRequest]:
         env_manager = DotenvManager(user_config_path)
         config = env_manager.read_env()
         graphrag_api_key = config.get("GRAPHRAG_API_KEY", None)
-        
 
+        directories = []
+        for dirpath, dirnames, filenames in os.walk(root_dir):
+            for dirname in dirnames:
+                directories.append(os.path.join(dirpath, dirname))
 
         return GlobalSearchRequest(api_key=graphrag_api_key), LocalSearchRequest(
             api_key=graphrag_api_key
@@ -127,7 +130,9 @@ class InitPipeline:
 
     @classmethod
     def get_query_engines(cls) -> Tuple[GlobalSearchEngine, LocalSearchEngine]:
-        global_request, local_request = cls.client.get_config_for_query(".env", cls.root_dir)
+        global_request, local_request = cls.client.get_config_for_query(
+            ".env", cls.root_dir
+        )
         global_engine = GlobalSearchEngine(global_request)
         local_engine = LocalSearchEngine(local_request)
         return global_engine, local_engine
