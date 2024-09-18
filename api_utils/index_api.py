@@ -4,7 +4,11 @@ from typing import Optional
 from pydantic import BaseModel
 
 # config
-from .default_config import ROOT_DIR, CONFIG_FILE_PATH, OUTPUT_DIR
+from .default_config import (
+    ROOT_DIR,
+    CONFIG_FILE_PATH,
+    OUTPUT_DIR,
+)
 
 
 class IndexingRequest(BaseModel):

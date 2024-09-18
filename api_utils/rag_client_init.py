@@ -1,7 +1,17 @@
 import os
-from .index_api import CommandRunner, IndexingRequest, PromptTuneRequest
+from typing import Tuple
+from .index_api import (
+    CommandRunner,
+    IndexingRequest,
+    PromptTuneRequest,
+)
 from .config import YamlManager, DotenvManager
-from .query_api import GlobalSearchEngine, LocalSearchEngine
+from .query_api import (
+    GlobalSearchEngine,
+    LocalSearchEngine,
+    GlobalSearchRequest,
+    LocalSearchRequest,
+)
 
 
 class RagClientInit:
@@ -57,15 +67,31 @@ class RagClientInit:
             yaml_config["claim_extraction"]["enabled"] = False
         yaml_manager.write_yaml(yaml_config)
 
-    def get_config_for_query(self, user_config_path):
+    def get_config_for_indexing(self, user_config_path) -> IndexingRequest:
+        env_manager = DotenvManager(user_config_path)
+        config = env_manager.read_env()
+        # TODO: Add more config options
+        return IndexingRequest()
+
+    def get_config_for_prompt_tune(self, user_config_path) -> PromptTuneRequest:
+        env_manager = DotenvManager(user_config_path)
+        config = env_manager.read_env()
+        # TODO: Add more config options
+        return PromptTuneRequest()
+
+    def get_config_for_query(
+        self, user_config_path
+    ) -> Tuple[GlobalSearchRequest, LocalSearchRequest]:
         env_manager = DotenvManager(user_config_path)
         config = env_manager.read_env()
         graphrag_api_key = config.get("GRAPHRAG_API_KEY", None)
-        
-        
-        return graphrag_api_key
+        # TODO: Add more config options
+        return GlobalSearchRequest(api_key=graphrag_api_key), LocalSearchRequest(
+            api_key=graphrag_api_key
+        )
 
 
+# This is a template for initializing the pipeline
 class InitPipeline:
     client = RagClientInit()  # load instance once
 
@@ -90,17 +116,7 @@ class InitPipeline:
 
     @classmethod
     def default_prompt_tune(cls):
-        request_prompt_tune = PromptTuneRequest(
-            # root="./ragtest",
-            # config="./ragtest/settings.yaml",
-            # domain="Cybersecurity Syllabus",
-            # limit=15,
-            # language="Chinese",
-            # max_tokens=2048,
-            # chunk_size=256,
-            # no_entity_types=True,
-            # output="./ragtest/prompts",
-        )
+        request_prompt_tune = cls.client.get_config_for_prompt_tune(".env")
         cls.client.initialize_prompt_tune(request_prompt_tune)
 
 
