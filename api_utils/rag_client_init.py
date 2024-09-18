@@ -1,6 +1,6 @@
 import os
-from index_api import CommandRunner, IndexingRequest, PromptTuneRequest
-from config import YamlManager, DotenvManager
+from .index_api import CommandRunner, IndexingRequest, PromptTuneRequest
+from .config import YamlManager, DotenvManager
 
 
 class RagClientInit:
@@ -52,6 +52,8 @@ class RagClientInit:
             yaml_config['claim_extraction']['enabled'] = True
         yaml_manager.write_yaml(yaml_config)
 
+class RagClientQuery:
+    pass
 
 class InitPipeline:
     client = RagClientInit()  # load instance once
