@@ -62,9 +62,6 @@ class GlobalSearchEngine:
 
         self.token_encoder = tiktoken.get_encoding("cl100k_base")
 
-        # search utils
-        self.community_level = community_level
-
         entity_df = pd.read_parquet(f"{input_dir}/{entity_table}.parquet")
         report_df = pd.read_parquet(
             f"{input_dir}/{community_report_table}.parquet")
@@ -72,13 +69,13 @@ class GlobalSearchEngine:
             f"{input_dir}/{entity_embedding_table}.parquet")
 
         reports = read_indexer_reports(
-            report_df, entity_df, self.community_level)
+            report_df, entity_df, community_level)
         entities = read_indexer_entities(
-            entity_df, entity_embedding_df, self.community_level)
+            entity_df, entity_embedding_df, community_level)
 
         print(f"Total report count: {len(report_df)}")
         print(f"Report count after filtering by community level {
-              self.community_level}: {len(reports)}")
+              community_level}: {len(reports)}")
         report_df.head()
 
         self.context_builder = GlobalCommunityContext(
@@ -157,19 +154,13 @@ class LocalSearchEngine:
             max_retries=20,
         )
 
-        # search utils
-        self.community_level = community_level
-
-        # read nodes table to get community and degree data
         entity_df = pd.read_parquet(f"{input_dir}/{entity_table}.parquet")
         entity_embedding_df = pd.read_parquet(
             f"{input_dir}/{entity_embedding_table}.parquet")
 
         entities = read_indexer_entities(
-            entity_df, entity_embedding_df, self.community_level)
+            entity_df, entity_embedding_df, community_level)
 
-        # load description embeddings to an in-memory lancedb vectorstore
-        # to connect to a remote db, specify url and port values.
         description_embedding_store = LanceDBVectorStore(
             collection_name="entity_description_embeddings",
         )
@@ -188,8 +179,6 @@ class LocalSearchEngine:
         print(f"Relationship count: {len(relationship_df)}")
         relationship_df.head()
 
-        # NOTE: covariates are turned off by default, because they generally need prompt tuning to be valuable
-        # Please see the GRAPHRAG_CLAIM_* settings
         covariate_df = pd.read_parquet(
             f"{input_dir}/{covariate_table}.parquet")
 
@@ -201,7 +190,7 @@ class LocalSearchEngine:
         report_df = pd.read_parquet(
             f"{input_dir}/{community_report_table}.parquet")
         reports = read_indexer_reports(
-            report_df, entity_df, self.community_level)
+            report_df, entity_df, community_level)
 
         print(f"Report records: {len(report_df)}")
         report_df.head()
@@ -241,7 +230,7 @@ class LocalSearchEngine:
         }
 
         self.llm_params = {
-            "max_tokens": 2_000,  #
+            "max_tokens": 2_000,
             "temperature": 0.0,
         }
 
