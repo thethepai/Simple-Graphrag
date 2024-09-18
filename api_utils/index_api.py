@@ -2,7 +2,6 @@ import subprocess
 from threading import Lock
 from typing import Optional
 from pydantic import BaseModel
-import gc
 
 
 class IndexingRequest(BaseModel):
@@ -43,12 +42,6 @@ class CommandRunner:
                     cls._instance = super(CommandRunner, cls).__new__(
                         cls, *args, **kwargs)
         return cls._instance
-
-    @classmethod
-    def destroy_instance(cls):
-        with cls._lock:
-            cls._instance = None
-            gc.collect()
 
     def run_indexing_command_default(self, request: IndexingRequest):
         command = [

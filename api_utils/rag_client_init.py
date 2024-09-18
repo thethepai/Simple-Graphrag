@@ -1,7 +1,7 @@
 import os
 from .index_api import CommandRunner, IndexingRequest, PromptTuneRequest
 from .config import YamlManager, DotenvManager
-
+from .query_api import GlobalSearchEngine, LocalSearchEngine
 
 class RagClientInit:
     def __init__(self):
