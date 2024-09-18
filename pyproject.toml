@@ -21,26 +21,9 @@ authors = [
     "Rodrigo Racanicci <rracanicci@microsoft.com>",
     "Sarah Smith <smithsarah@microsoft.com>",
 ]
-license = "MIT"
 readme = "README.md"
 packages = [{ include = "graphrag" }]
 package-mode = false
-
-[tool.poetry.urls]
-"Source" = "https://github.com/microsoft/graphrag"
-
-[tool.poetry-dynamic-versioning]
-enable = true
-style = "pep440"
-vcs = "git"
-bump = true
-format-jinja = """
-    {%- if distance == 0 -%}
-        {{ serialize_pep440(base, stage, revision) }}
-    {%- else -%}
-        {{ serialize_pep440(base, stage, revision, dev=distance) }}
-    {%- endif -%}
-"""
 
 [tool.poetry.dependencies]
 python = ">=3.10,<3.13"
@@ -94,7 +77,13 @@ azure-storage-blob = "^12.22.0"
 azure-identity = "^1.17.1"
 json-repair = "^0.28.4"
 
+# future
 future = "^1.0.0"
+
+#Personal
+openpyxl = "^3.1.5"
+neo4j = "^5.24.0"
+
 [tool.poetry.group.dev.dependencies]
 coverage = "^7.6.0"
 ipykernel = "^6.29.4"
@@ -107,7 +96,6 @@ pytest-asyncio = "^0.24.0"
 pytest-timeout = "^2.3.1"
 ruff = "^0.6.2"
 semversioner = "^2.0.3"
-
 update-toml = "^0.2.1"
 
 [build-system]
@@ -118,3 +106,5 @@ build-backend = "poetry_dynamic_versioning.backend"
 index = "python -m graphrag.index"
 query = "python -m graphrag.query"
 prompt_tune = "python -m graphrag.prompt_tune"
+index_init = "python -m graphrag.index --init --root ./ragtest"
+prompt_tune_init = "python -m graphrag.prompt_tune --root /path/to/project --config /path/to/settings.yaml --no-entity-types"
