@@ -44,7 +44,8 @@ EMBEDDING_MODEL = "embedding-3"
 API_BASE = "https://open.bigmodel.cn/api/paas/v4/"
 
 # parquet files generated from indexing pipeline
-INPUT_DIR = "./ragtest/output/20240917-211927/artifacts"
+OUTPUT_DATE = "20240917-211927"
+INPUT_DIR = f"./ragtest/output/{OUTPUT_DATE}/artifacts"
 COMMUNITY_REPORT_TABLE = "create_final_community_reports"
 ENTITY_TABLE = "create_final_nodes"
 ENTITY_EMBEDDING_TABLE = "create_final_entities"
@@ -82,31 +83,31 @@ class LocalSearchRequest(BaseModel):
     community_level: int = COMMUNITY_LEVEL
 
 class GlobalSearchEngine:
-    def __init__(self, api_key, model, api_base, input_dir, entity_table, community_report_table, entity_embedding_table, community_level):
+    def __init__(self, request: GlobalSearchRequest):
         self.llm = ChatOpenAI(
-            api_key=api_key,
-            model=model,
-            api_base=api_base,
+            api_key=request.api_key,
+            model=request.model,
+            api_base=request.api_base,
             api_type=OpenaiApiType.OpenAI,
             max_retries=20,
         )
 
         self.token_encoder = tiktoken.get_encoding("cl100k_base")
 
-        entity_df = pd.read_parquet(f"{input_dir}/{entity_table}.parquet")
+        entity_df = pd.read_parquet(f"{request.input_dir}/{request.entity_table}.parquet")
         report_df = pd.read_parquet(
-            f"{input_dir}/{community_report_table}.parquet")
+            f"{request.input_dir}/{request.community_report_table}.parquet")
         entity_embedding_df = pd.read_parquet(
-            f"{input_dir}/{entity_embedding_table}.parquet")
+            f"{request.input_dir}/{request.entity_embedding_table}.parquet")
 
         reports = read_indexer_reports(
-            report_df, entity_df, community_level)
+            report_df, entity_df, request.community_level)
         entities = read_indexer_entities(
-            entity_df, entity_embedding_df, community_level)
+            entity_df, entity_embedding_df, request.community_level)
 
         print(f"Total report count: {len(report_df)}")
         print(f"Report count after filtering by community level {
-              community_level}: {len(reports)}")
+              request.community_level}: {len(reports)}")
         report_df.head()
 
         self.context_builder = GlobalCommunityContext(
@@ -164,11 +165,11 @@ class GlobalSearchEngine:
               result.prompt_tokens}")
 
 class LocalSearchEngine:
-    def __init__(self, api_key, model, embedding_model, api_base, input_dir, lancedb_uri, entity_table, community_report_table, relationship_table, covariate_table, entity_embedding_table, text_unit_table, community_level):
+    def __init__(self, request: LocalSearchRequest):
         self.llm = ChatOpenAI(
-            api_key=api_key,
-            model=model,
-            api_base=api_base,
+            api_key=request.api_key,
+            model=request.model,
+            api_base=request.api_base,
             api_type=OpenaiApiType.OpenAI,
             max_retries=20,
         )
@@ -176,25 +177,25 @@ class LocalSearchEngine:
         self.token_encoder = tiktoken.get_encoding("cl100k_base")
 
         self.text_embedder = OpenAIEmbedding(
-            api_key=api_key,
-            api_base=api_base,
+            api_key=request.api_key,
+            api_base=request.api_base,
             api_type=OpenaiApiType.OpenAI,
-            model=embedding_model,
-            deployment_name=embedding_model,
+            model=request.embedding_model,
+            deployment_name=request.embedding_model,
             max_retries=20,
         )
 
-        entity_df = pd.read_parquet(f"{input_dir}/{entity_table}.parquet")
+        entity_df = pd.read_parquet(f"{request.input_dir}/{request.entity_table}.parquet")
         entity_embedding_df = pd.read_parquet(
-            f"{input_dir}/{entity_embedding_table}.parquet")
+            f"{request.input_dir}/{request.entity_embedding_table}.parquet")
 
         entities = read_indexer_entities(
-            entity_df, entity_embedding_df, community_level)
+            entity_df, entity_embedding_df, request.community_level)
 
         description_embedding_store = LanceDBVectorStore(
             collection_name="entity_description_embeddings",
         )
-        description_embedding_store.connect(db_uri=lancedb_uri)
+        description_embedding_store.connect(db_uri=request.lancedb_uri)
         entity_description_embeddings = store_entity_semantic_embeddings(
             entities=entities, vectorstore=description_embedding_store
         )
@@ -203,14 +204,14 @@ class LocalSearchEngine:
         entity_df.head()
 
         relationship_df = pd.read_parquet(
-            f"{input_dir}/{relationship_table}.parquet")
+            f"{request.input_dir}/{request.relationship_table}.parquet")
         relationships = read_indexer_relationships(relationship_df)
 
         print(f"Relationship count: {len(relationship_df)}")
         relationship_df.head()
 
         covariate_df = pd.read_parquet(
-            f"{input_dir}/{covariate_table}.parquet")
+            f"{request.input_dir}/{request.covariate_table}.parquet")
 
         claims = read_indexer_covariates(covariate_df)
 
@@ -218,15 +219,15 @@ class LocalSearchEngine:
         covariates = {"claims": claims}
 
         report_df = pd.read_parquet(
-            f"{input_dir}/{community_report_table}.parquet")
+            f"{request.input_dir}/{request.community_report_table}.parquet")
         reports = read_indexer_reports(
-            report_df, entity_df, community_level)
+            report_df, entity_df, request.community_level)
 
         print(f"Report records: {len(report_df)}")
         report_df.head()
 
         text_unit_df = pd.read_parquet(
-            f"{input_dir}/{text_unit_table}.parquet")
+            f"{request.input_dir}/{request.text_unit_table}.parquet")
         text_units = read_indexer_text_units(text_unit_df)
 
         print(f"Text unit records: {len(text_unit_df)}")
@@ -290,11 +291,11 @@ class LocalSearchEngine:
 
 if __name__ == "__main__":
     # Example usage
-    search_engine_g = GlobalSearchEngine(API_KEY, LLM_MODEL, API_BASE, INPUT_DIR,
-                                        ENTITY_TABLE, COMMUNITY_REPORT_TABLE, ENTITY_EMBEDDING_TABLE, COMMUNITY_LEVEL)
+    global_search_params = GlobalSearchRequest()
+    search_engine_g = GlobalSearchEngine(global_search_params)
     asyncio.run(search_engine_g.run_search("介绍一下网络空间安全课程"))
 
     # Example usage
-    search_engine_l = LocalSearchEngine(API_KEY, LLM_MODEL, EMBEDDING_MODEL, API_BASE, INPUT_DIR, LANCEDB_URI, ENTITY_TABLE,
-                                        COMMUNITY_REPORT_TABLE, RELATIONSHIP_TABLE, COVARIATE_TABLE, ENTITY_EMBEDDING_TABLE, TEXT_UNIT_TABLE, COMMUNITY_LEVEL)
+    local_search_params = LocalSearchRequest()
+    search_engine_l = LocalSearchEngine(local_search_params)
     asyncio.run(search_engine_l.run_search("介绍一下肖凌老师"))
