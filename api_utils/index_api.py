@@ -5,6 +5,22 @@ from pydantic import BaseModel
 import asyncio
 import os
 import sys
+from graphrag.index.cli import index_cli
+
+index_cli(
+    root=self.root,
+    init=False,
+    verbose=False,
+    resume=None,
+    update_index_id=False,
+    memprofile=False,
+    nocache=False,
+    reporter=None,
+    config_filepath=None,
+    emit=None,
+    dryrun=False,
+    skip_validations=False,
+)
 
 # config
 from api_utils.default_config import (
@@ -60,30 +76,20 @@ class CommandRunner:
             cls._instance = None
 
     def run_indexing_command_default(self, request: IndexingRequest):
-        command = [
-            "python",
-            "-m",
-            "graphrag.index",
-            "--init" if request.init else "",
-            "--root",
-            request.root,
-        ]
-        command = [arg for arg in command if arg]  # Remove empty strings
-        
-        #env
-        env = os.environ.copy()
-        env["PYTHONPATH"] = os.pathsep.join(sys.path)
-
-        result = subprocess.run(
-            command,
-            capture_output=True,
-            text=True,
-            encoding="utf-8",
-            env=env,
+        index_cli(
+            root=request.root,
+            init=request.init,
+            verbose=False,
+            resume=None,
+            update_index_id=False,
+            memprofile=False,
+            nocache=False,
+            reporter=None,
+            config_filepath=None,
+            emit=None,
+            dryrun=False,
+            skip_validations=False,
         )
-        if not result.stderr:
-            result.stderr = "none"
-        return result.stdout, result.stderr
 
     def run_indexing_command(self, request: IndexingRequest):
         command = [
@@ -93,16 +99,13 @@ class CommandRunner:
             "--init" if request.init else "",
             "--root",
             request.root,
-            "--config",
-            request.config_filepath,
-            "--resume",
-            request.resume,
-            "--emit",
-            request.emit,
+            "--config" if request.config_filepath else "",
+            "--resume" if request.resume else "",
+            "--emit" if request.emit else "",
         ]
         command = [arg for arg in command if arg]  # Remove empty strings
-        
-        #env
+
+        # env
         env = os.environ.copy()
         env["PYTHONPATH"] = os.pathsep.join(sys.path)
 
@@ -131,8 +134,8 @@ class CommandRunner:
             "--no-entity-types" if request.no_entity_types else "",
         ]
         command = [arg for arg in command if arg]  # Remove empty strings
-        
-        #env
+
+        # env
         env = os.environ.copy()
         env["PYTHONPATH"] = os.pathsep.join(sys.path)
 
@@ -169,8 +172,8 @@ class CommandRunner:
             request.output,
         ]
         command = [arg for arg in command if arg]  # Remove empty strings
-        
-        #env
+
+        # env
         env = os.environ.copy()
         env["PYTHONPATH"] = os.pathsep.join(sys.path)
 
