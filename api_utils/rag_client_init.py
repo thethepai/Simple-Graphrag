@@ -5,7 +5,11 @@ from api_utils.index_api import (
     IndexingRequest,
     PromptTuneRequest,
 )
-from api_utils.config import YamlManager, DotenvManager
+from api_utils.config import (
+    YamlManager, 
+    DotenvManager, 
+    ConfigOperator,
+)
 from api_utils.query_api import (
     GlobalSearchEngine,
     LocalSearchEngine,
@@ -22,7 +26,7 @@ class RagClientInit:
     def initialize_indexing(self, request_index):
         if not os.path.exists(request_index.root):
             os.makedirs(request_index.root)
-        
+
         stdout, stderr = self.runner.run_indexing_command_default(request_index)
         print("STDOUT:", stdout)
         print("STDERR:", stderr)
@@ -42,16 +46,30 @@ class RagClientInit:
         print("STDERR:", stderr)
 
     def initialize_config(self, user_config_path, env_config_path, yaml_config_path):
+        config_operator = ConfigOperator(user_config_path, env_config_path, yaml_config_path)
+        config_operator.initialize_config()
+
+    def initialize_config_old(self, user_config_path, env_config_path, yaml_config_path):
+        print(
+            f"Initializing configuration with user_config_path: {user_config_path}, env_config_path: {env_config_path}, yaml_config_path: {yaml_config_path}"
+        )
+
         env_manager = DotenvManager(user_config_path)
         yaml_manager = YamlManager(yaml_config_path)
 
         user_config = env_manager.read_env()
+        print(f"User config read from {user_config_path}: {user_config}")
+
         yaml_config = yaml_manager.read_yaml()
+        print(f"YAML config read from {yaml_config_path}: {yaml_config}")
 
         env_manager = DotenvManager(env_config_path)
         api_key = user_config.get("GRAPHRAG_API_KEY")
+        print(f"API Key from user config: {api_key}")
+
         api_key_config = {"GRAPHRAG_API_KEY": api_key}
         env_manager.write_env(api_key_config)
+        print(f"API Key written to env config at {env_config_path}")
 
         yaml_config["embeddings"]["llm"]["api_base"] = user_config.get(
             "API_BASE", yaml_config["embeddings"]["llm"].get("api_base")
@@ -68,9 +86,15 @@ class RagClientInit:
 
         if user_config.get("CLAIM_EXTRACTION") == "True":
             yaml_config["claim_extraction"]["enabled"] = True
+            print("Claim extraction enabled")
         else:
             yaml_config["claim_extraction"]["enabled"] = False
+            print("Claim extraction disabled")
+        
+        print(f"Updated YAML config with user config values: {yaml_config}")
+
         yaml_manager.write_yaml(yaml_config)
+        print(f"Final YAML config written to {yaml_config_path}")
 
     def get_config_for_indexing(self, user_config_path) -> IndexingRequest:
         env_manager = DotenvManager(user_config_path)
@@ -148,9 +172,9 @@ class InitPipeline:
 
 
 if __name__ == "__main__":
-    InitPipeline.default_init()
+    # InitPipeline.default_init()
     # InitPipeline.default_config()
-    # InitPipeline.default_prompt_tune()
+    InitPipeline.default_prompt_tune()
 
     # global_engine, local_engine = InitPipeline.get_query_engines()
 

@@ -45,6 +45,55 @@ class YamlManager:
         with open(self.yaml_path, "w") as file:
             yaml.safe_dump(data, file)
 
+class ConfigOperator:
+    def __init__(self, user_config_path, env_config_path, yaml_config_path):
+        self.user_config_path = user_config_path
+        self.env_config_path = env_config_path
+        self.yaml_config_path = yaml_config_path
+        self.user_env_manager = DotenvManager(user_config_path)
+        self.env_manager = DotenvManager(env_config_path)
+        self.yaml_manager = YamlManager(yaml_config_path)
+        print(
+            f"Initializing configuration with user_config_path: {self.user_config_path}, env_config_path: {self.env_config_path}, yaml_config_path: {self.yaml_config_path}"
+        )
+
+    def initialize_config(self):
+        user_config = self.user_env_manager.read_env()
+        print(f"User config read from {self.user_config_path}: {user_config}")
+
+        yaml_config = self.yaml_manager.read_yaml()
+        print(f"YAML config read from {self.yaml_config_path}: {yaml_config}")
+
+        api_key = user_config.get("GRAPHRAG_API_KEY")
+        print(f"API Key from user config: {api_key}")
+
+        api_key_config = {"GRAPHRAG_API_KEY": api_key}
+        self.env_manager.write_env(api_key_config)
+        print(f"API Key written to env config at {self.env_config_path}")
+
+        yaml_config["embeddings"]["llm"]["api_base"] = user_config.get(
+            "API_BASE", yaml_config["embeddings"]["llm"].get("api_base")
+        )
+        yaml_config["llm"]["api_base"] = user_config.get(
+            "API_BASE", yaml_config["llm"].get("api_base")
+        )
+        yaml_config["llm"]["model"] = user_config.get(
+            "MODEL_ID", yaml_config["llm"].get("model")
+        )
+        yaml_config["embeddings"]["llm"]["model"] = user_config.get(
+            "MODEL_ID", yaml_config["embeddings"]["llm"].get("model")
+        )
+
+        if user_config.get("CLAIM_EXTRACTION_ENABLED", False) == "true":
+            yaml_config["claim_extraction"]["enabled"] = "true"
+            print("Claim extraction enabled")
+        else:
+            print("Claim extraction disabled")
+
+        self.yaml_manager.write_yaml(yaml_config)
+        print(f"Final YAML config written to {self.yaml_config_path}")
+
+
 
 def dot_test():
     dotenv_manager = DotenvManager(".env")
