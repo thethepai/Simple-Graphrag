@@ -7,21 +7,6 @@ import os
 import sys
 from graphrag.index.cli import index_cli
 
-index_cli(
-    root=self.root,
-    init=False,
-    verbose=False,
-    resume=None,
-    update_index_id=False,
-    memprofile=False,
-    nocache=False,
-    reporter=None,
-    config_filepath=None,
-    emit=None,
-    dryrun=False,
-    skip_validations=False,
-)
-
 # config
 from api_utils.default_config import (
     ROOT_DIR,
@@ -77,11 +62,11 @@ class CommandRunner:
 
     def run_indexing_command_default(self, request: IndexingRequest):
         index_cli(
-            root=request.root,
+            root_dir=request.root,
             init=request.init,
             verbose=False,
             resume=None,
-            update_index_id=False,
+            update_index_id=None,
             memprofile=False,
             nocache=False,
             reporter=None,
