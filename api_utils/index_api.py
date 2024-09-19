@@ -151,7 +151,7 @@ if __name__ == "__main__":
     print("STDOUT:", stdout)
     print("STDERR:", stderr)
 
-    requestPromptTune = PromptTuneRequest()
-    stdout, stderr = runner.run_prompt_tune_command(requestPromptTune)
-    print("STDOUT:", stdout)
-    print("STDERR:", stderr)
+    # requestPromptTune = PromptTuneRequest()
+    # stdout, stderr = runner.run_prompt_tune_command(requestPromptTune)
+    # print("STDOUT:", stdout)
+    # print("STDERR:", stderr)
