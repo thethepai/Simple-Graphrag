@@ -59,7 +59,7 @@ class CommandRunner:
         with cls._lock:
             cls._instance = None
 
-    async def run_indexing_command_default(self, request: IndexingRequest):
+    def run_indexing_command_default(self, request: IndexingRequest):
         command = [
             "python",
             "-m",
@@ -69,39 +69,15 @@ class CommandRunner:
             request.root,
         ]
         command = [arg for arg in command if arg]  # Remove empty strings
-
-        try:
-            env = os.environ.copy()
-            # If using a virtual environment, ensure the correct Python interpreter is used
-            env["PYTHONPATH"] = os.pathsep.join(sys.path)
-
-            process = await asyncio.create_subprocess_exec(
-                *command,
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE,
-                env=env,
-            )
-
-            async def read_stream(stream):
-                while True:
-                    line = await stream.readline()
-                    if not line:
-                        break
-                    line = line.decode("gbk", "ignore").strip()
-                    print(line)
-
-            await asyncio.gather(
-                read_stream(process.stdout), read_stream(process.stderr)
-            )
-
-            await process.wait()
-
-            if process.returncode == 0:
-                print("Indexing completed successfully")
-            else:
-                print("Indexing failed")
-        except Exception as e:
-            print(f"Indexing failed: {str(e)}")
+        result = subprocess.run(
+            command,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+        )
+        if not result.stderr:
+            result.stderr = "none"
+        return result.stdout, result.stderr
 
     def run_indexing_command(self, request: IndexingRequest):
         command = [
@@ -189,15 +165,19 @@ class CommandRunner:
 # Example usage
 if __name__ == "__main__":
 
-    async def index_test():
+    def index_test():
         requestIndex = IndexingRequest(init=False)
         runner = CommandRunner()
-        await runner.run_indexing_command_default(requestIndex)
+        stdout, stderr = runner.run_indexing_command_default(requestIndex)
+        print(stdout)
+        print(stderr)
 
-    async def prompt_test():
+    def prompt_test():
         requestPromptTune = PromptTuneRequest()
         runner = CommandRunner()
-        await runner.run_prompt_tune_command(requestPromptTune)
+        stdout, stderr = runner.run_prompt_tune_command(requestPromptTune)
+        print(stdout)
+        print(stderr)
 
-    asyncio.run(index_test())
-    # asyncio.run(prompt_test())
+    index_test()
+    # prompt_test()
