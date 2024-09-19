@@ -5,6 +5,8 @@ from pydantic import BaseModel
 import asyncio
 import os
 import sys
+from graphrag.index.emit.types import TableEmitterType
+from graphrag.index.progress import ReporterType
 from graphrag.index.cli import index_cli
 
 # config
@@ -61,6 +63,9 @@ class CommandRunner:
             cls._instance = None
 
     def run_indexing_command_default(self, request: IndexingRequest):
+        # TODO: Implement default values
+        reporter = ReporterType.PRINT
+        emit = [TableEmitterType.Parquet]
         index_cli(
             root_dir=request.root,
             init=request.init,
@@ -69,9 +74,9 @@ class CommandRunner:
             update_index_id=None,
             memprofile=False,
             nocache=False,
-            reporter=None,
+            reporter=reporter,
             config_filepath=None,
-            emit=None,
+            emit=emit,
             dryrun=False,
             skip_validations=False,
         )

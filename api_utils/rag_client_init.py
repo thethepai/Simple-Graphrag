@@ -130,9 +130,8 @@ class InitPipeline:
 
 
 if __name__ == "__main__":
-    InitPipeline.default_init()
+    # InitPipeline.default_init()
     # InitPipeline.default_config()
-
     # InitPipeline.default_start_index()
 
     # InitPipeline.default_prompt_tune()
