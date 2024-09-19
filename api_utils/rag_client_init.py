@@ -1,4 +1,5 @@
 import os
+import asyncio
 from typing import Tuple
 from api_utils.index_api import (
     CommandRunner,
@@ -6,8 +7,8 @@ from api_utils.index_api import (
     PromptTuneRequest,
 )
 from api_utils.config import (
-    YamlManager, 
-    DotenvManager, 
+    YamlManager,
+    DotenvManager,
     ConfigOperator,
 )
 from api_utils.query_api import (
@@ -46,55 +47,10 @@ class RagClientInit:
         print("STDERR:", stderr)
 
     def initialize_config(self, user_config_path, env_config_path, yaml_config_path):
-        config_operator = ConfigOperator(user_config_path, env_config_path, yaml_config_path)
+        config_operator = ConfigOperator(
+            user_config_path, env_config_path, yaml_config_path
+        )
         config_operator.initialize_config()
-
-    def initialize_config_old(self, user_config_path, env_config_path, yaml_config_path):
-        print(
-            f"Initializing configuration with user_config_path: {user_config_path}, env_config_path: {env_config_path}, yaml_config_path: {yaml_config_path}"
-        )
-
-        env_manager = DotenvManager(user_config_path)
-        yaml_manager = YamlManager(yaml_config_path)
-
-        user_config = env_manager.read_env()
-        print(f"User config read from {user_config_path}: {user_config}")
-
-        yaml_config = yaml_manager.read_yaml()
-        print(f"YAML config read from {yaml_config_path}: {yaml_config}")
-
-        env_manager = DotenvManager(env_config_path)
-        api_key = user_config.get("GRAPHRAG_API_KEY")
-        print(f"API Key from user config: {api_key}")
-
-        api_key_config = {"GRAPHRAG_API_KEY": api_key}
-        env_manager.write_env(api_key_config)
-        print(f"API Key written to env config at {env_config_path}")
-
-        yaml_config["embeddings"]["llm"]["api_base"] = user_config.get(
-            "API_BASE", yaml_config["embeddings"]["llm"].get("api_base")
-        )
-        yaml_config["llm"]["api_base"] = user_config.get(
-            "API_BASE", yaml_config["llm"].get("api_base")
-        )
-        yaml_config["llm"]["model"] = user_config.get(
-            "MODEL_ID", yaml_config["llm"].get("model")
-        )
-        yaml_config["embeddings"]["llm"]["model"] = user_config.get(
-            "EMBEDDING_MODEL_ID", yaml_config["embeddings"]["llm"].get("model")
-        )
-
-        if user_config.get("CLAIM_EXTRACTION") == "True":
-            yaml_config["claim_extraction"]["enabled"] = True
-            print("Claim extraction enabled")
-        else:
-            yaml_config["claim_extraction"]["enabled"] = False
-            print("Claim extraction disabled")
-        
-        print(f"Updated YAML config with user config values: {yaml_config}")
-
-        yaml_manager.write_yaml(yaml_config)
-        print(f"Final YAML config written to {yaml_config_path}")
 
     def get_config_for_indexing(self, user_config_path) -> IndexingRequest:
         env_manager = DotenvManager(user_config_path)
@@ -109,20 +65,21 @@ class RagClientInit:
         return PromptTuneRequest()
 
     def get_config_for_query(
-        self, user_config_path, root_dir=ROOT_DIR
+        self, user_config_path, root_dir=f"{ROOT_DIR}"
     ) -> Tuple[GlobalSearchRequest, LocalSearchRequest]:
         env_manager = DotenvManager(user_config_path)
         config = env_manager.read_env()
         graphrag_api_key = config.get("GRAPHRAG_API_KEY", None)
 
         directories = []
-        for dirpath, dirnames, filenames in os.walk(root_dir):
+        output_dir = f"{root_dir}/output"
+        for dirpath, dirnames, filenames in os.walk(output_dir):
             for dirname in dirnames:
-                directories.append(os.path.join(dirname))
+                directories.append(os.path.join(dirpath, dirname, "artifacts"))
 
         input_dir = directories[0]
         # TODO: Add more directories options
-
+        print(f"Using input_dir: {input_dir}")
         return GlobalSearchRequest(
             api_key=graphrag_api_key,
             input_dir=input_dir,
@@ -135,23 +92,23 @@ class RagClientInit:
 # This is a template for initializing the pipeline
 class InitPipeline:
     client = RagClientInit()
-    root_dir = None
+    root_dir = "./ragtest"
 
     @classmethod
     def default_init(cls):
-        request_index = IndexingRequest(root="./ragtest")
-        cls.root_dir = cls.client.initialize_indexing(request_index)
+        request_index = IndexingRequest(root=cls.root_dir)
+        cls.client.initialize_indexing(request_index)
 
     @classmethod
     def default_start_index(cls):
-        request_index = IndexingRequest(root="./ragtest", init=False)
+        request_index = IndexingRequest(root=cls.root_dir, init=False)
         cls.client.initialize_indexing(request_index)
 
     @classmethod
     def default_config(cls):
         user_config_path = ".env"
-        env_config_path = "./ragtest/.env"
-        yaml_config_path = "./ragtest/settings.yaml"
+        env_config_path = f"{cls.root_dir}/.env"
+        yaml_config_path = f"{cls.root_dir}/settings.yaml"
         cls.client.initialize_config(
             user_config_path, env_config_path, yaml_config_path
         )
@@ -164,7 +121,8 @@ class InitPipeline:
     @classmethod
     def get_query_engines(cls) -> Tuple[GlobalSearchEngine, LocalSearchEngine]:
         global_request, local_request = cls.client.get_config_for_query(
-            ".env", cls.root_dir
+            ".env",
+            cls.root_dir,
         )
         global_engine = GlobalSearchEngine(global_request)
         local_engine = LocalSearchEngine(local_request)
@@ -177,9 +135,11 @@ if __name__ == "__main__":
 
     # 这个有问题，还是要换成cli来实现，subprocess纯逆天
     # InitPipeline.default_start_index()
-    
+
     # InitPipeline.default_prompt_tune()
 
     global_engine, local_engine = InitPipeline.get_query_engines()
+
+    asyncio.run(global_engine.run_search("介绍一下网络空间安全课程"))
 
     print("Done")
