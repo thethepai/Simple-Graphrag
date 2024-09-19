@@ -86,6 +86,25 @@ class CommandRunner:
             skip_validations=False,
         )
 
+    def run_prompt_tune_command_default(self, request: PromptTuneRequest):
+        # TODO: Implement default values
+        selection_method = DocSelectionType.RANDOM
+        prompt_tune(
+            config=request.config,
+            root=request.root,
+            domain=request.domain,
+            selection_method=selection_method,
+            limit=request.limit,
+            max_tokens=request.max_tokens,
+            chunk_size=request.chunk_size,
+            language=request.language,
+            skip_entity_types=request.no_entity_types,
+            output=request.output,
+            n_subset_max=request.n_subset_max,
+            k=request.k,
+            min_examples_required=request.min_examples_required,
+        )
+
     def run_indexing_command(self, request: IndexingRequest):
         command = [
             "python",
@@ -116,24 +135,6 @@ class CommandRunner:
         if not result.stderr:
             result.stderr = "none"
         return result.stdout, result.stderr
-
-    def run_prompt_tune_command_default(self, request: PromptTuneRequest):
-        selection_method = DocSelectionType.RANDOM
-        prompt_tune(
-            config=request.config,
-            root=request.root,
-            domain=request.domain,
-            selection_method=selection_method,
-            limit=request.limit,
-            max_tokens=request.max_tokens,
-            chunk_size=request.chunk_size,
-            language=request.language,
-            skip_entity_types=request.no_entity_types,
-            output=request.output,
-            n_subset_max=request.n_subset_max,
-            k=request.k,
-            min_examples_required=request.min_examples_required,
-        )
 
     def run_prompt_tune_command(self, request: PromptTuneRequest):
         command = [
@@ -180,16 +181,12 @@ if __name__ == "__main__":
     def index_test():
         requestIndex = IndexingRequest(init=False)
         runner = CommandRunner()
-        stdout, stderr = runner.run_indexing_command_default(requestIndex)
-        print(stdout)
-        print(stderr)
+        runner.run_indexing_command_default(requestIndex)
 
     def prompt_test():
         requestPromptTune = PromptTuneRequest()
         runner = CommandRunner()
-        stdout, stderr = runner.run_prompt_tune_command(requestPromptTune)
-        print(stdout)
-        print(stderr)
+        runner.run_prompt_tune_command(requestPromptTune)
 
     index_test()
     # prompt_test()
