@@ -67,7 +67,12 @@ class CommandRunner:
             request.root,
         ]
         command = [arg for arg in command if arg]  # Remove empty strings
-        result = subprocess.run(command, capture_output=True, text=True)
+        result = subprocess.run(
+            command,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+        )
         if not result.stderr:
             result.stderr = "none"
         return result.stdout, result.stderr
@@ -89,7 +94,12 @@ class CommandRunner:
             request.emit,
         ]
         command = [arg for arg in command if arg]  # Remove empty strings
-        result = subprocess.run(command, capture_output=True, text=True)
+        result = subprocess.run(
+            command,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+        )
         if not result.stderr:
             result.stderr = "none"
         return result.stdout, result.stderr
@@ -109,7 +119,12 @@ class CommandRunner:
             "--no-entity-types" if request.no_entity_types else "",
         ]
         command = [arg for arg in command if arg]  # Remove empty strings
-        result = subprocess.run(command, capture_output=True, text=True)
+        result = subprocess.run(
+            command,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+        )
         if not result.stderr:
             result.stderr = "none"
         return result.stdout, result.stderr
@@ -137,7 +152,12 @@ class CommandRunner:
             request.output,
         ]
         command = [arg for arg in command if arg]  # Remove empty strings
-        result = subprocess.run(command, capture_output=True, text=True)
+        result = subprocess.run(
+            command,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+        )
         if not result.stderr:
             result.stderr = "none"
         return result.stdout, result.stderr
