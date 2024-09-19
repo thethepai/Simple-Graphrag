@@ -3,6 +3,8 @@ from threading import Lock
 from typing import Optional
 from pydantic import BaseModel
 import asyncio
+import os
+import sys
 
 # config
 from api_utils.default_config import (
@@ -69,10 +71,15 @@ class CommandRunner:
         command = [arg for arg in command if arg]  # Remove empty strings
 
         try:
+            env = os.environ.copy()
+            # If using a virtual environment, ensure the correct Python interpreter is used
+            env["PYTHONPATH"] = os.pathsep.join(sys.path)
+
             process = await asyncio.create_subprocess_exec(
                 *command,
                 stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE
+                stderr=asyncio.subprocess.PIPE,
+                env=env,
             )
 
             async def read_stream(stream):
@@ -84,8 +91,7 @@ class CommandRunner:
                     print(line)
 
             await asyncio.gather(
-                read_stream(process.stdout),
-                read_stream(process.stderr)
+                read_stream(process.stdout), read_stream(process.stderr)
             )
 
             await process.wait()
@@ -182,11 +188,16 @@ class CommandRunner:
 
 # Example usage
 if __name__ == "__main__":
-    requestIndex = IndexingRequest(init=False)
-    runner = CommandRunner()
-    runner.run_indexing_command_default(requestIndex)
 
-    # requestPromptTune = PromptTuneRequest()
-    # stdout, stderr = runner.run_prompt_tune_command(requestPromptTune)
-    # print("STDOUT:", stdout)
-    # print("STDERR:", stderr)
+    async def index_test():
+        requestIndex = IndexingRequest(init=False)
+        runner = CommandRunner()
+        await runner.run_indexing_command_default(requestIndex)
+
+    async def prompt_test():
+        requestPromptTune = PromptTuneRequest()
+        runner = CommandRunner()
+        await runner.run_prompt_tune_command(requestPromptTune)
+
+    asyncio.run(index_test())
+    # asyncio.run(prompt_test())
