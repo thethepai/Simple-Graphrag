@@ -1,55 +1,26 @@
 import streamlit as st
-import pandas as pd
-import altair as alt
-from urllib.error import URLError
+import os
 
 st.set_page_config(page_title="Indexing", page_icon="📊")
 
-st.markdown("# Indexing Cofiguration")
+st.markdown("# Indexing Configuration")
 st.sidebar.header("Indexing Configuration")
 st.write(
     """Here you can configure the settings for the indexing."""
 )
 
+save_folder = "uploaded_files"
+if not os.path.exists(save_folder):
+    os.makedirs(save_folder)
 
-@st.cache_data
-def get_UN_data():
-    AWS_BUCKET_URL = "http://streamlit-demo-data.s3-us-west-2.amazonaws.com"
-    df = pd.read_csv(AWS_BUCKET_URL + "/agri.csv.gz")
-    return df.set_index("Region")
-
-
-try:
-    df = get_UN_data()
-    countries = st.multiselect(
-        "Choose countries", list(df.index), ["China", "United States of America"]
-    )
-    if not countries:
-        st.error("Please select at least one country.")
-    else:
-        data = df.loc[countries]
-        data /= 1000000.0
-        st.write("### Gross Agricultural Production ($B)", data.sort_index())
-
-        data = data.T.reset_index()
-        data = pd.melt(data, id_vars=["index"]).rename(
-            columns={"index": "year", "value": "Gross Agricultural Product ($B)"}
-        )
-        chart = (
-            alt.Chart(data)
-            .mark_area(opacity=0.3)
-            .encode(
-                x="year:T",
-                y=alt.Y("Gross Agricultural Product ($B):Q", stack=None),
-                color="Region:N",
-            )
-        )
-        st.altair_chart(chart, use_container_width=True)
-except URLError as e:
-    st.error(
-        """
-        **This demo requires internet access.**
-        Connection error: %s
-    """
-        % e.reason
-    )
+uploaded_files = st.file_uploader(
+    "Choose a txt or xlsx file", accept_multiple_files=True
+)
+for uploaded_file in uploaded_files:
+    bytes_data = uploaded_file.read()
+    st.write("filename:", uploaded_file.name)
+    st.write(bytes_data)
+    
+    with open(os.path.join(save_folder, uploaded_file.name), "wb") as f:
+        f.write(bytes_data)
+    st.write(f"File saved to {os.path.join(save_folder, uploaded_file.name)}")

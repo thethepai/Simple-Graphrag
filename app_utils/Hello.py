@@ -28,17 +28,5 @@ st.markdown(
     1. **Installation**: Install the necessary dependencies and set up the environment.
     2. **Configuration**: Configure the connection settings for your databases.
     3. **Usage**: Start using the graphical interface to manage your graph databases and make API calls.
-
-    ## Documentation
-
-    For detailed documentation and examples, please refer to the [official documentation](#).
-
-    ## Contributing
-
-    We welcome contributions! Please see our [contributing guidelines](#) for more information.
-
-    ## License
-
-    This project is licensed under the MIT License. See the [LICENSE](#) file for details.
     """
 )
