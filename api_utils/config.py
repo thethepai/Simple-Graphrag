@@ -102,10 +102,10 @@ def dot_test():
     print("Current .env variables:", env_vars)
 
     # Writing to .env file
-    new_vars = {"NEW_KEY": "new_value", "ANOTHER_KEY": "another_value_new"}
+    new_vars = {"MODEL_ID": "new_value", "ANOTHER_KEY": "another_value_new"}
     dotenv_manager.write_env(new_vars)
     # Deleting from .env file
-    keys_to_delete = ["NEW_KEY"]
+    keys_to_delete = ["ANOTHER_KEY"]
     dotenv_manager.delete_env(keys_to_delete)
 
 
@@ -132,5 +132,5 @@ def yaml_test():
 
 
 if __name__ == "__main__":
-    # dot_test()
-    yaml_test()
+    dot_test()
+    # yaml_test()
