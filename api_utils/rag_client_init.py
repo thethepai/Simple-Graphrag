@@ -1,18 +1,18 @@
 import os
 from typing import Tuple
-from .index_api import (
+from index_api import (
     CommandRunner,
     IndexingRequest,
     PromptTuneRequest,
 )
-from .config import YamlManager, DotenvManager
-from .query_api import (
+from config import YamlManager, DotenvManager
+from query_api import (
     GlobalSearchEngine,
     LocalSearchEngine,
     GlobalSearchRequest,
     LocalSearchRequest,
 )
-from .default_config import ROOT_DIR
+from default_config import ROOT_DIR
 
 
 class RagClientInit:
@@ -92,10 +92,17 @@ class RagClientInit:
         directories = []
         for dirpath, dirnames, filenames in os.walk(root_dir):
             for dirname in dirnames:
-                directories.append(os.path.join(dirpath, dirname))
+                directories.append(os.path.join(dirname))
 
-        return GlobalSearchRequest(api_key=graphrag_api_key), LocalSearchRequest(
-            api_key=graphrag_api_key
+        input_dir = directories[0]
+        # TODO: Add more directories options
+
+        return GlobalSearchRequest(
+            api_key=graphrag_api_key,
+            input_dir=input_dir,
+        ), LocalSearchRequest(
+            api_key=graphrag_api_key,
+            input_dir=input_dir,
         )
 
 
@@ -139,7 +146,7 @@ class InitPipeline:
 
 
 if __name__ == "__main__":
-    # InitPipeline.default_init()
+    InitPipeline.default_init()
     # InitPipeline.default_config()
     # InitPipeline.default_prompt_tune()
 

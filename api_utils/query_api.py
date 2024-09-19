@@ -38,7 +38,7 @@ from graphrag.query.structured_search.local_search.search import LocalSearch
 from graphrag.vector_stores.lancedb import LanceDBVectorStore
 
 # config
-from .default_config import (
+from default_config import (
     API_KEY, LLM_MODEL, EMBEDDING_MODEL, 
     API_BASE, INPUT_DIR, COMMUNITY_REPORT_TABLE, 
     ENTITY_TABLE, ENTITY_EMBEDDING_TABLE, RELATIONSHIP_TABLE, 

@@ -4,7 +4,7 @@ from typing import Optional
 from pydantic import BaseModel
 
 # config
-from .default_config import (
+from default_config import (
     ROOT_DIR,
     CONFIG_FILE_PATH,
     OUTPUT_DIR,
