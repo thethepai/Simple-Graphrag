@@ -174,10 +174,12 @@ class InitPipeline:
 if __name__ == "__main__":
     # InitPipeline.default_init()
     # InitPipeline.default_config()
+
+    # 这个有问题，还是要换成cli来实现，subprocess纯逆天
     # InitPipeline.default_start_index()
-    InitPipeline.default_prompt_tune()
+    
+    # InitPipeline.default_prompt_tune()
 
-    # global_engine, local_engine = InitPipeline.get_query_engines()
+    global_engine, local_engine = InitPipeline.get_query_engines()
 
-    # TODO: test above functions
     print("Done")

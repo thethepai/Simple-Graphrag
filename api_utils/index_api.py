@@ -69,11 +69,17 @@ class CommandRunner:
             request.root,
         ]
         command = [arg for arg in command if arg]  # Remove empty strings
+        
+        #env
+        env = os.environ.copy()
+        env["PYTHONPATH"] = os.pathsep.join(sys.path)
+
         result = subprocess.run(
             command,
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env=env,
         )
         if not result.stderr:
             result.stderr = "none"
@@ -95,11 +101,17 @@ class CommandRunner:
             request.emit,
         ]
         command = [arg for arg in command if arg]  # Remove empty strings
+        
+        #env
+        env = os.environ.copy()
+        env["PYTHONPATH"] = os.pathsep.join(sys.path)
+
         result = subprocess.run(
             command,
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env=env,
         )
         if not result.stderr:
             result.stderr = "none"
@@ -119,11 +131,17 @@ class CommandRunner:
             "--no-entity-types" if request.no_entity_types else "",
         ]
         command = [arg for arg in command if arg]  # Remove empty strings
+        
+        #env
+        env = os.environ.copy()
+        env["PYTHONPATH"] = os.pathsep.join(sys.path)
+
         result = subprocess.run(
             command,
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env=env,
         )
         if not result.stderr:
             result.stderr = "none"
@@ -151,11 +169,17 @@ class CommandRunner:
             request.output,
         ]
         command = [arg for arg in command if arg]  # Remove empty strings
+        
+        #env
+        env = os.environ.copy()
+        env["PYTHONPATH"] = os.pathsep.join(sys.path)
+
         result = subprocess.run(
             command,
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env=env,
         )
         if not result.stderr:
             result.stderr = "none"
