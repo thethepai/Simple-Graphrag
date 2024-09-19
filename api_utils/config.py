@@ -81,7 +81,7 @@ class ConfigOperator:
             "MODEL_ID", yaml_config["llm"].get("model")
         )
         yaml_config["embeddings"]["llm"]["model"] = user_config.get(
-            "MODEL_ID", yaml_config["embeddings"]["llm"].get("model")
+            "EMBEDDING_MODEL_ID", yaml_config["embeddings"]["llm"].get("model")
         )
 
         if user_config.get("CLAIM_EXTRACTION", False) == "True":
