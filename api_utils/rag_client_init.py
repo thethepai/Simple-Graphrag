@@ -26,13 +26,13 @@ class RagClientInit:
     def initialize_indexing(self, request_index):
         if not os.path.exists(request_index.root):
             os.makedirs(request_index.root)
+            print(f"创建了:{request_index.root}文件夹")
 
         stdout, stderr = self.runner.run_indexing_command_default(request_index)
         print("STDOUT:", stdout)
         print("STDERR:", stderr)
 
         if os.path.exists(request_index.root):
-            print(f"创建了{request_index.root}文件夹")
             input_folder = os.path.join(request_index.root, "input")
             if not os.path.exists(input_folder):
                 os.makedirs(input_folder)
@@ -174,7 +174,8 @@ class InitPipeline:
 if __name__ == "__main__":
     # InitPipeline.default_init()
     # InitPipeline.default_config()
-    InitPipeline.default_prompt_tune()
+    InitPipeline.default_start_index()
+    # InitPipeline.default_prompt_tune()
 
     # global_engine, local_engine = InitPipeline.get_query_engines()
 

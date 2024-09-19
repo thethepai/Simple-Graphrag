@@ -145,7 +145,7 @@ class CommandRunner:
 
 # Example usage
 if __name__ == "__main__":
-    requestIndex = IndexingRequest()
+    requestIndex = IndexingRequest(init=False)
     runner = CommandRunner()
     stdout, stderr = runner.run_indexing_command_default(requestIndex)
     print("STDOUT:", stdout)

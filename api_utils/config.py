@@ -84,8 +84,8 @@ class ConfigOperator:
             "MODEL_ID", yaml_config["embeddings"]["llm"].get("model")
         )
 
-        if user_config.get("CLAIM_EXTRACTION_ENABLED", False) == "true":
-            yaml_config["claim_extraction"]["enabled"] = "true"
+        if user_config.get("CLAIM_EXTRACTION", False) == "True":
+            yaml_config["claim_extraction"]["enabled"] = True
             print("Claim extraction enabled")
         else:
             print("Claim extraction disabled")
