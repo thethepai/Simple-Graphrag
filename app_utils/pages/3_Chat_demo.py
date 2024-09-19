@@ -11,7 +11,6 @@ st.write("""a test for the chat demo""")
 
 global_engine, local_engine = InitPipeline.get_query_engines()
 
-# 在侧边栏添加选择框
 engine_option = st.sidebar.selectbox(
     "Select Engine",
     ("Global Engine", "Local Engine")
@@ -24,27 +23,23 @@ for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
-if prompt := st.chat_input("What is up?"):
+if prompt := st.chat_input("Ask question about entities and relationships"):
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.markdown(prompt)
 
-    # 根据选择的引擎进行搜索
     if engine_option == "Global Engine":
         search_result = asyncio.run(global_engine.search(prompt))
     else:
         search_result = asyncio.run(local_engine.search(prompt))
 
-    # 显示搜索结果
     with st.chat_message("assistant"):
         st.markdown("**Search Result:**")
         print(search_result.response)
         st.markdown(search_result.response)
 
-    # 将搜索结果添加到会话状态中
     st.session_state.messages.append({"role": "assistant", "content": search_result.response})
     
-    # Display result information on the dashboard using layout on the right side
     with st.expander("Search Result Details", expanded=True):
         st.markdown("### Search Result Details")
     

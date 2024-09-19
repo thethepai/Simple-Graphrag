@@ -79,9 +79,11 @@ class RagClientInit:
 
         directories = []
         output_dir = f"{root_dir}/output"
-        for dirpath, dirnames, filenames in os.walk(output_dir):
-            for dirname in dirnames:
-                directories.append(os.path.join(dirpath, dirname, "artifacts"))
+        directories = [
+            os.path.join(output_dir, name, "artifacts") for name in os.listdir(output_dir)
+            if os.path.isdir(os.path.join(output_dir, name))
+        ]
+        print("Directories found:", directories)
 
         if directories:
             query_input_dir = directories[choice]
@@ -145,7 +147,7 @@ if __name__ == "__main__":
     # InitPipeline.default_start_index()
     # InitPipeline.default_prompt_tune()
 
-    # global_engine, local_engine = InitPipeline.get_query_engines()
+    global_engine, local_engine = InitPipeline.get_query_engines()
 
     # asyncio.run(global_engine.run_search("介绍一下网络空间安全课程"))
 

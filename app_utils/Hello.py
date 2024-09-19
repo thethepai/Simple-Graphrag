@@ -11,16 +11,34 @@ st.sidebar.success("Select a demo above.")
 
 st.markdown(
     """
-    Streamlit is an open-source app framework built specifically for
-    Machine Learning and Data Science projects.
-    **👈 Select a demo from the sidebar** to see some examples
-    of what Streamlit can do!
-    ### Want to learn more?
-    - 1
-    - 2
-    - 3
-    ### See more complex demos
-    - 1
-    - 2
-"""
+    # simple-graphrag
+
+    The `simple-graphrag` project is a user-friendly interface for the `graphrag` engine. It provides a range of features to facilitate the management and configuration of graph databases. Key functionalities include:
+
+    ## Features
+
+    - **API Service Calls**: Easily interact with the `graphrag` engine through a comprehensive set of API endpoints.
+    - **Graphical Configuration**: Configure your graph databases using an intuitive graphical interface.
+    - **Database Management**: Connect to and manage multiple databases seamlessly.
+
+    ## Getting Started
+
+    To get started with `simple-graphrag`, follow these steps:
+
+    1. **Installation**: Install the necessary dependencies and set up the environment.
+    2. **Configuration**: Configure the connection settings for your databases.
+    3. **Usage**: Start using the graphical interface to manage your graph databases and make API calls.
+
+    ## Documentation
+
+    For detailed documentation and examples, please refer to the [official documentation](#).
+
+    ## Contributing
+
+    We welcome contributions! Please see our [contributing guidelines](#) for more information.
+
+    ## License
+
+    This project is licensed under the MIT License. See the [LICENSE](#) file for details.
+    """
 )
