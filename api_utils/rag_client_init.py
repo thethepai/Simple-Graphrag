@@ -1,18 +1,18 @@
 import os
 from typing import Tuple
-from index_api import (
+from api_utils.index_api import (
     CommandRunner,
     IndexingRequest,
     PromptTuneRequest,
 )
-from config import YamlManager, DotenvManager
-from query_api import (
+from api_utils.config import YamlManager, DotenvManager
+from api_utils.query_api import (
     GlobalSearchEngine,
     LocalSearchEngine,
     GlobalSearchRequest,
     LocalSearchRequest,
 )
-from default_config import ROOT_DIR
+from api_utils.default_config import ROOT_DIR
 
 
 class RagClientInit:
@@ -20,13 +20,15 @@ class RagClientInit:
         self.runner = CommandRunner()
 
     def initialize_indexing(self, request_index):
+        if not os.path.exists(request_index.root):
+            os.makedirs(request_index.root)
+        
         stdout, stderr = self.runner.run_indexing_command_default(request_index)
         print("STDOUT:", stdout)
         print("STDERR:", stderr)
 
         if os.path.exists(request_index.root):
             print(f"创建了{request_index.root}文件夹")
-            # default folder name in graphrag
             input_folder = os.path.join(request_index.root, "input")
             if not os.path.exists(input_folder):
                 os.makedirs(input_folder)
