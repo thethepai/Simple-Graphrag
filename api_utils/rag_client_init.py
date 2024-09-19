@@ -80,7 +80,8 @@ class RagClientInit:
         directories = []
         output_dir = f"{root_dir}/output"
         directories = [
-            os.path.join(output_dir, name, "artifacts") for name in os.listdir(output_dir)
+            os.path.join(output_dir, name, "artifacts")
+            for name in os.listdir(output_dir)
             if os.path.isdir(os.path.join(output_dir, name))
         ]
         print("Directories found:", directories)
@@ -105,6 +106,8 @@ class RagClientInit:
 class InitPipeline:
     client = RagClientInit()
     root_dir = ROOT_DIR
+    _query_engines_instance = None
+    _config_engines_instance = None
 
     @classmethod
     def default_init(cls):
@@ -131,14 +134,41 @@ class InitPipeline:
         cls.client.initialize_prompt_tune(request_prompt_tune)
 
     @classmethod
+    def get_config_engines(cls) -> Tuple[
+        YamlManager,
+        DotenvManager,
+        ConfigOperator,
+    ]:
+        if cls._config_engines_instance is None:
+            yaml_manager = YamlManager(f"{cls.root_dir}/settings.yaml")
+            dotenv_manager = DotenvManager(".env")
+            config_operator = ConfigOperator(
+                ".env",
+                f"{cls.root_dir}/.env",
+                f"{cls.root_dir}/settings.yaml",
+            )
+            cls._config_engines_instance = (yaml_manager, dotenv_manager, config_operator)
+        return cls._config_engines_instance
+
+    @classmethod
     def get_query_engines(cls) -> Tuple[GlobalSearchEngine, LocalSearchEngine]:
-        global_request, local_request = cls.client.get_config_for_query(
-            ".env",
-            cls.root_dir,
-        )
-        global_engine = GlobalSearchEngine(global_request)
-        local_engine = LocalSearchEngine(local_request)
-        return global_engine, local_engine
+        if cls._query_engines_instance is None:
+            global_request, local_request = cls.client.get_config_for_query(
+                ".env",
+                cls.root_dir,
+            )
+            global_engine = GlobalSearchEngine(global_request)
+            local_engine = LocalSearchEngine(local_request)
+            cls._query_engines_instance = (global_engine, local_engine)
+        return cls._query_engines_instance
+
+    @classmethod
+    def reset_query_engines(cls):
+        cls._query_engines_instance = None
+
+    @classmethod
+    def reset_config_engines(cls):
+        cls._config_engines_instance = None
 
 
 if __name__ == "__main__":

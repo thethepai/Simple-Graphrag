@@ -6,8 +6,8 @@ import pandas as pd
 st.set_page_config(page_title="Chat Demo", page_icon="📱")
 
 st.markdown("# Chat Demo")
-st.sidebar.header("Chat Demo")
-st.write("""a test for the chat demo""")
+st.sidebar.header("Chat Demo Configuration")
+st.write("""start a conversation with the assistant""")
 
 global_engine, local_engine = InitPipeline.get_query_engines()
 
@@ -42,27 +42,27 @@ if prompt := st.chat_input("Ask question about entities and relationships"):
     
     with st.expander("Search Result Details", expanded=True):
         st.markdown("### Search Result Details")
-    
+
         st.markdown("**Reports:**")
         reports = search_result.context_data.get("reports", "No reports available")
         st.dataframe(reports if isinstance(reports, pd.DataFrame) else pd.DataFrame([reports]))
-    
+
         st.markdown("**Entities:**")
         entities = search_result.context_data.get("entities", "No entities available")
         st.dataframe(entities if isinstance(entities, pd.DataFrame) else pd.DataFrame([entities]))
-    
+
         st.markdown("**Relationships:**")
         relationships = search_result.context_data.get("relationships", "No relationships available")
         st.dataframe(relationships if isinstance(relationships, pd.DataFrame) else pd.DataFrame([relationships]))
-    
+
         st.markdown("**Sources:**")
         sources = search_result.context_data.get("sources", "No sources available")
         st.dataframe(sources if isinstance(sources, pd.DataFrame) else pd.DataFrame([sources]))
-    
+
         if "claims" in search_result.context_data:
             st.markdown("**Claims:**")
             claims = search_result.context_data.get("claims", "No claims available")
             st.dataframe(claims if isinstance(claims, pd.DataFrame) else pd.DataFrame([claims]))
-    
+
         st.markdown(f"**LLM calls:** {search_result.llm_calls}")
         st.markdown(f"**LLM tokens:** {search_result.prompt_tokens}")
