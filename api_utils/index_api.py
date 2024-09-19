@@ -2,6 +2,7 @@ import subprocess
 from threading import Lock
 from typing import Optional
 from pydantic import BaseModel
+import asyncio
 
 # config
 from api_utils.default_config import (
@@ -56,33 +57,51 @@ class CommandRunner:
         with cls._lock:
             cls._instance = None
 
-    def run_indexing_command_default(self, request: IndexingRequest):
+    async def run_indexing_command_default(self, request: IndexingRequest):
         command = [
-            "poetry",
-            "run",
-            "poe",
-            "index",
+            "python",
+            "-m",
+            "graphrag.index",
             "--init" if request.init else "",
             "--root",
             request.root,
         ]
         command = [arg for arg in command if arg]  # Remove empty strings
-        result = subprocess.run(
-            command,
-            capture_output=True,
-            text=True,
-            encoding="utf-8",
-        )
-        if not result.stderr:
-            result.stderr = "none"
-        return result.stdout, result.stderr
+
+        try:
+            process = await asyncio.create_subprocess_exec(
+                *command,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE
+            )
+
+            async def read_stream(stream):
+                while True:
+                    line = await stream.readline()
+                    if not line:
+                        break
+                    line = line.decode().strip()
+                    print(line)
+
+            await asyncio.gather(
+                read_stream(process.stdout),
+                read_stream(process.stderr)
+            )
+
+            await process.wait()
+
+            if process.returncode == 0:
+                print("Indexing completed successfully")
+            else:
+                print("Indexing failed")
+        except Exception as e:
+            print(f"Indexing failed: {str(e)}")
 
     def run_indexing_command(self, request: IndexingRequest):
         command = [
-            "poetry",
-            "run",
-            "poe",
-            "index",
+            "python",
+            "-m",
+            "graphrag.index",
             "--init" if request.init else "",
             "--root",
             request.root,
@@ -106,10 +125,9 @@ class CommandRunner:
 
     def run_prompt_tune_command_default(self, request: PromptTuneRequest):
         command = [
-            "poetry",
-            "run",
-            "poe",
-            "prompt_tune",
+            "python",
+            "-m",
+            "graphrag.prompt_tune",
             "--root",
             request.root,
             "--config",
@@ -131,10 +149,9 @@ class CommandRunner:
 
     def run_prompt_tune_command(self, request: PromptTuneRequest):
         command = [
-            "poetry",
-            "run",
-            "poe",
-            "prompt_tune",
+            "python",
+            "-m",
+            "graphrag.prompt_tune",
             "--root",
             request.root,
             "--config",
@@ -167,9 +184,7 @@ class CommandRunner:
 if __name__ == "__main__":
     requestIndex = IndexingRequest(init=False)
     runner = CommandRunner()
-    stdout, stderr = runner.run_indexing_command_default(requestIndex)
-    print("STDOUT:", stdout)
-    print("STDERR:", stderr)
+    runner.run_indexing_command_default(requestIndex)
 
     # requestPromptTune = PromptTuneRequest()
     # stdout, stderr = runner.run_prompt_tune_command(requestPromptTune)
