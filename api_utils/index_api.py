@@ -87,7 +87,7 @@ class CommandRunner:
                     line = await stream.readline()
                     if not line:
                         break
-                    line = line.decode().strip()
+                    line = line.decode("gbk", "ignore").strip()
                     print(line)
 
             await asyncio.gather(
