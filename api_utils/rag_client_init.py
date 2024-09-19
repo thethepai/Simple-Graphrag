@@ -44,7 +44,12 @@ class RagClientInit:
         print("STDOUT:", stdout)
         print("STDERR:", stderr)
 
-    def initialize_config(self, user_config_path, env_config_path, yaml_config_path):
+    def initialize_config(
+        self,
+        user_config_path,
+        env_config_path,
+        yaml_config_path,
+    ):
         config_operator = ConfigOperator(
             user_config_path, env_config_path, yaml_config_path
         )
@@ -63,7 +68,10 @@ class RagClientInit:
         return PromptTuneRequest()
 
     def get_config_for_query(
-        self, user_config_path, root_dir=f"{ROOT_DIR}"
+        self,
+        user_config_path,
+        root_dir=f"{ROOT_DIR}",
+        choice=-1,
     ) -> Tuple[GlobalSearchRequest, LocalSearchRequest]:
         env_manager = DotenvManager(user_config_path)
         config = env_manager.read_env()
@@ -75,22 +83,26 @@ class RagClientInit:
             for dirname in dirnames:
                 directories.append(os.path.join(dirpath, dirname, "artifacts"))
 
-        input_dir = directories[0]
+        if directories:
+            query_input_dir = directories[choice]
+        else:
+            print("No directories found")
         # TODO: Add more directories options
-        print(f"Using input_dir: {input_dir}")
+        print(f"Using input_dir: {query_input_dir}")
         return GlobalSearchRequest(
             api_key=graphrag_api_key,
-            input_dir=input_dir,
+            input_dir=query_input_dir,
         ), LocalSearchRequest(
             api_key=graphrag_api_key,
-            input_dir=input_dir,
+            input_dir=query_input_dir,
         )
 
 
+# TODO: Asynchronous version
 # This is a template for initializing the pipeline
 class InitPipeline:
     client = RagClientInit()
-    root_dir = "./ragtest"
+    root_dir = ROOT_DIR
 
     @classmethod
     def default_init(cls):
@@ -131,8 +143,7 @@ if __name__ == "__main__":
     # InitPipeline.default_init()
     # InitPipeline.default_config()
     # InitPipeline.default_start_index()
-
-    InitPipeline.default_prompt_tune()
+    # InitPipeline.default_prompt_tune()
 
     # global_engine, local_engine = InitPipeline.get_query_engines()
 
