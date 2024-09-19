@@ -20,7 +20,7 @@ graphrag_api_key = st.text_input("GRAPHRAG_API_KEY", user_config.get("GRAPHRAG_A
 api_base = st.text_input("API_BASE", user_config.get("API_BASE", "https://open.bigmodel.cn/api/paas/v4/"))
 model_id = st.text_input("MODEL_ID", user_config.get("MODEL_ID", "glm-4"))
 embedding_model_id = st.text_input("EMBEDDING_MODEL_ID", user_config.get("EMBEDDING_MODEL_ID", "embedding-3"))
-claim_extraction = st.toggle("CLAIM_EXTRACTION", value=user_config.get("CLAIM_EXTRACTION", "True"))
+claim_extraction = st.toggle("CLAIM_EXTRACTION", value=user_config.get("CLAIM_EXTRACTION", "True") == "True")
 
 # Define a function to update the configuration
 def update_config():
@@ -28,7 +28,7 @@ def update_config():
     user_config["API_BASE"] = api_base
     user_config["MODEL_ID"] = model_id
     user_config["EMBEDDING_MODEL_ID"] = embedding_model_id
-    user_config["CLAIM_EXTRACTION"] = claim_extraction
+    user_config["CLAIM_EXTRACTION"] = str(claim_extraction)
     user_dotenv_manager.write_env(user_config)
     st.success("Configuration updated successfully!")
 
@@ -43,24 +43,3 @@ if st.button("Submit"):
 
 if st.button("Read Configuration"):
     reload_config()
-
-"""
-Initializing configuration with user_config_path: .env, env_config_path: ./ragtest/.env, yaml_config_path: ./ragtest/settings.yaml
-2024-09-20 00:44:25.186 Uncaught app exception
-Traceback (most recent call last):
-  File "E:\documents\vscode-project\Simple-Graphrag\.venv\Lib\site-packages\streamlit\runtime\scriptrunner\exec_code.py", line 88, in exec_func_with_error_handling
-    result = func()
-             ^^^^^^
-  File "E:\documents\vscode-project\Simple-Graphrag\.venv\Lib\site-packages\streamlit\runtime\scriptrunner\script_runner.py", line 590, in code_to_exec
-    exec(code, module.__dict__)
-  File "E:\documents\vscode-project\Simple-Graphrag\app_utils\pages\1_Settings.py", line 42, in <module>
-    update_config()
-  File "E:\documents\vscode-project\Simple-Graphrag\app_utils\pages\1_Settings.py", line 32, in update_config
-    user_dotenv_manager.write_env(user_config)
-  File "E:\documents\vscode-project\Simple-Graphrag\api_utils\config.py", line 25, in write_env
-    set_key(self.dotenv_path, key, value)
-  File "E:\documents\vscode-project\Simple-Graphrag\.venv\Lib\site-packages\dotenv\main.py", line 175, in set_key
-    value_out = "'{}'".format(value_to_set.replace("'", "\\'"))
-                              ^^^^^^^^^^^^^^^^^^^^
-AttributeError: 'bool' object has no attribute 'replace'
-"""
