@@ -67,7 +67,13 @@ For detailed usage, please check the start page in the app and refer to the micr
 ## 🪟TODOs
 
 - [ ] Fastapi support
-  - Reason: Streamlit has high overhead and poor performance for backend tasks. FastAPI offers better performance and scalability.
+  - Streamlit has high overhead and poor performance for backend tasks. FastAPI offers better performance and scalability.
 
 - [ ] Nextjs frontend
-  - Reason: Streamlit's frontend capabilities are limited and not suitable for complex UI requirements. Next.js provides a more robust and flexible frontend framework.
+  - Streamlit's frontend capabilities are limited and not suitable for complex UI requirements. Next.js provides a more robust and flexible frontend framework.
+
+- [ ] Neo4j ui
+  - use neo4j to manage graph data easily
+
+- [ ] Query rewrite and multi session improve
+  - Rewriting user queries can improve recall rates. Enhancing multi-turn conversations with reference replacement can improve user experience.
