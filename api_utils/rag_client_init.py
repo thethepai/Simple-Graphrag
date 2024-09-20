@@ -1,5 +1,6 @@
 import os
 import asyncio
+from threading import Lock
 from typing import Tuple
 from api_utils.index_api import (
     CommandRunner,
@@ -21,15 +22,33 @@ from api_utils.default_config import ROOT_DIR
 
 
 class RagClientInit:
+    _instance = None
+    _lock = Lock()
+
+    def __new__(cls, *args, **kwargs):
+        if not cls._instance:
+            with cls._lock:
+                if not cls._instance:
+                    cls._instance = super(RagClientInit, cls).__new__(
+                        cls, *args, **kwargs
+                    )
+        return cls._instance
+
     def __init__(self):
         self.runner = CommandRunner()
 
-    def initialize_indexing(self, request_index):
+    @classmethod
+    def destroy_instance(cls):
+        with cls._lock:
+            cls._instance = None
+
+    def initialize_indexing(self, request_index: IndexingRequest = IndexingRequest()):
         if not os.path.exists(request_index.root):
             os.makedirs(request_index.root)
             print(f"创建了:{request_index.root}文件夹")
-
-        self.runner.run_indexing_command_default(request_index)
+        else:
+            print(f"文件夹:{request_index.root}已存在，你是否已经运行过初始化了？")
+            return
 
         if os.path.exists(request_index.root):
             input_folder = os.path.join(request_index.root, "input")
@@ -37,12 +56,12 @@ class RagClientInit:
                 os.makedirs(input_folder)
                 print(f"创建了{input_folder}文件夹")
 
-        return request_index.root
+        self.runner.run_indexing_command_default(request_index)
 
-    def initialize_prompt_tune(self, request_prompt_tune):
-        stdout, stderr = self.runner.run_prompt_tune_command(request_prompt_tune)
-        print("STDOUT:", stdout)
-        print("STDERR:", stderr)
+    def initialize_prompt_tune(
+        self, request_prompt_tune: PromptTuneRequest = PromptTuneRequest()
+    ):
+        self.runner.run_prompt_tune_command_default(request_prompt_tune)
 
     def initialize_config(
         self,
@@ -104,80 +123,92 @@ class RagClientInit:
 # TODO: Asynchronous version
 # This is a template for initializing the pipeline
 class InitPipeline:
-    client = RagClientInit()
-    root_dir = ROOT_DIR
-    _query_engines_instance = None
-    _config_engines_instance = None
+    _instance = None
+    _lock = Lock()
 
-    @classmethod
-    def default_init(cls):
-        request_index = IndexingRequest(root=cls.root_dir)
-        cls.client.initialize_indexing(request_index)
+    def __new__(cls, *args, **kwargs):
+        if not cls._instance:
+            with cls._lock:
+                if not cls._instance:
+                    cls._instance = super(InitPipeline, cls).__new__(
+                        cls, *args, **kwargs
+                    )
+        return cls._instance
 
-    @classmethod
-    def default_start_index(cls):
-        request_index = IndexingRequest(root=cls.root_dir, init=False)
-        cls.client.initialize_indexing(request_index)
+    def __init__(self):
+        self.client = RagClientInit()
+        self.root_dir = ROOT_DIR
+        self._query_engines_instance = None
+        self._config_engines_instance = None
 
-    @classmethod
-    def default_config(cls):
+    def default_init(self):
+        request_index = IndexingRequest(root=self.root_dir)
+        self.client.initialize_indexing(request_index)
+
+    def default_start_index(self):
+        request_index = IndexingRequest(root=self.root_dir, init=False)
+        self.client.initialize_indexing(request_index)
+
+    def default_config(self):
         user_config_path = ".env"
-        env_config_path = f"{cls.root_dir}/.env"
-        yaml_config_path = f"{cls.root_dir}/settings.yaml"
-        cls.client.initialize_config(
+        env_config_path = f"{self.root_dir}/.env"
+        yaml_config_path = f"{self.root_dir}/settings.yaml"
+        self.client.initialize_config(
             user_config_path, env_config_path, yaml_config_path
         )
 
-    @classmethod
-    def default_prompt_tune(cls):
-        request_prompt_tune = cls.client.get_config_for_prompt_tune(".env")
-        cls.client.initialize_prompt_tune(request_prompt_tune)
+    def default_prompt_tune(self):
+        request_prompt_tune = self.client.get_config_for_prompt_tune(".env")
+        self.client.initialize_prompt_tune(request_prompt_tune)
 
-    @classmethod
-    def get_config_engines(cls) -> Tuple[
+    def get_config_engines(self) -> Tuple[
         YamlManager,
         DotenvManager,
         ConfigOperator,
     ]:
-        if cls._config_engines_instance is None:
-            yaml_manager = YamlManager(f"{cls.root_dir}/settings.yaml")
+        if self._config_engines_instance is None:
+            yaml_manager = YamlManager(f"{self.root_dir}/settings.yaml")
             dotenv_manager = DotenvManager(".env")
             config_operator = ConfigOperator(
                 ".env",
-                f"{cls.root_dir}/.env",
-                f"{cls.root_dir}/settings.yaml",
+                f"{self.root_dir}/.env",
+                f"{self.root_dir}/settings.yaml",
             )
-            cls._config_engines_instance = (yaml_manager, dotenv_manager, config_operator)
-        return cls._config_engines_instance
+            self._config_engines_instance = (
+                yaml_manager,
+                dotenv_manager,
+                config_operator,
+            )
+        return self._config_engines_instance
 
-    @classmethod
-    def get_query_engines(cls) -> Tuple[GlobalSearchEngine, LocalSearchEngine]:
-        if cls._query_engines_instance is None:
-            global_request, local_request = cls.client.get_config_for_query(
+    def get_query_engines(self) -> Tuple[GlobalSearchEngine, LocalSearchEngine]:
+        if self._query_engines_instance is None:
+            global_request, local_request = self.client.get_config_for_query(
                 ".env",
-                cls.root_dir,
+                self.root_dir,
             )
             global_engine = GlobalSearchEngine(global_request)
             local_engine = LocalSearchEngine(local_request)
-            cls._query_engines_instance = (global_engine, local_engine)
-        return cls._query_engines_instance
+            self._query_engines_instance = (global_engine, local_engine)
+        return self._query_engines_instance
 
     @classmethod
-    def reset_query_engines(cls):
-        cls._query_engines_instance = None
+    def reset_query_engines(self):
+        self._query_engines_instance = None
 
     @classmethod
-    def reset_config_engines(cls):
-        cls._config_engines_instance = None
+    def reset_config_engines(self):
+        self._config_engines_instance = None
 
 
 if __name__ == "__main__":
-    # InitPipeline.default_init()
-    # InitPipeline.default_config()
-    # InitPipeline.default_start_index()
-    # InitPipeline.default_prompt_tune()
+    pipeline = InitPipeline()
+    pipeline.default_init()
+    pipeline.default_config()
+    # pipeline.default_start_index()
+    # pipeline.default_prompt_tune()
 
-    global_engine, local_engine = InitPipeline.get_query_engines()
+    # global_engine, local_engine = pipeline.get_query_engines()
 
     # asyncio.run(global_engine.run_search("介绍一下网络空间安全课程"))
 
