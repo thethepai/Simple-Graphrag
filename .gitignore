@@ -8,7 +8,7 @@
 *.pyc
 /ragtest/
 /graphrag-files/
-/examples-notebooks/
+/examples_notebooks/
 /data/*
 !/data/
 **/__pycache__/
