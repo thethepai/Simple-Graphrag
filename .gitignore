@@ -9,7 +9,8 @@
 /ragtest/
 /graphrag-files/
 /examples-notebooks/
-/data/
+/data/*
+!/data/
 **/__pycache__/
 
 # Node Artifacts
