@@ -49,4 +49,7 @@ if st.sidebar.button("Start Indexing"):
         st.sidebar.error("Please upload files first")
 
 if st.sidebar.button("Prompt Tune"):
-    st.sidebar.warning("This feature is not available yet")
+    if os.listdir(DATA_INDEX_DIR):
+        pipeline.default_prompt_tune()
+    else:
+        st.sidebar.error("Please upload files first")

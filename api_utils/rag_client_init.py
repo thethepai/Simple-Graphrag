@@ -205,11 +205,11 @@ if __name__ == "__main__":
     pipeline = InitPipeline()
     # pipeline.default_init()
     # pipeline.default_config()
-    pipeline.default_start_index()
+    # pipeline.default_start_index()
     # pipeline.default_prompt_tune()
 
-    # global_engine, local_engine = pipeline.get_query_engines()
-
+    global_engine, local_engine = pipeline.get_query_engines()
     # asyncio.run(global_engine.run_search("介绍一下网络空间安全课程"))
+    # asyncio.run(local_engine.run_search("介绍一下肖凌老师"))
 
     print("Done")
