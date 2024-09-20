@@ -1,6 +1,7 @@
 import os
 from dotenv import load_dotenv, set_key, unset_key
 import yaml
+from api_utils.default_config import ROOT_DIR
 
 
 class DotenvManager:
@@ -20,7 +21,7 @@ class DotenvManager:
                     env_vars[key] = value
         return env_vars
 
-    def write_env(self, new_vars):
+    def write_env(self, new_vars: dict):
         for key, value in new_vars.items():
             set_key(self.dotenv_path, key, value)
 
@@ -30,7 +31,7 @@ class DotenvManager:
 
 
 class YamlManager:
-    def __init__(self, yaml_path="settings.yaml"):
+    def __init__(self, yaml_path=f"{ROOT_DIR}/settings.yaml"):
         self.yaml_path = yaml_path
         if not os.path.exists(self.yaml_path):
             with open(self.yaml_path, "w") as file:
@@ -41,9 +42,10 @@ class YamlManager:
         with open(self.yaml_path, "r") as file:
             return yaml.safe_load(file)
 
-    def write_yaml(self, data):
+    def write_yaml(self, data: dict):
         with open(self.yaml_path, "w") as file:
             yaml.safe_dump(data, file)
+
 
 class ConfigOperator:
     def __init__(self, user_config_path, env_config_path, yaml_config_path):
@@ -84,7 +86,7 @@ class ConfigOperator:
             "EMBEDDING_MODEL_ID", yaml_config["embeddings"]["llm"].get("model")
         )
 
-        if user_config.get("CLAIM_EXTRACTION", "False") == "True":
+        if user_config.get("CLAIM_EXTRACTION", "False").strip("'\"").lower() == "true":
             yaml_config["claim_extraction"]["enabled"] = True
             print("Claim extraction enabled")
         else:
@@ -92,7 +94,6 @@ class ConfigOperator:
 
         self.yaml_manager.write_yaml(yaml_config)
         print(f"Final YAML config written to {self.yaml_config_path}")
-
 
 
 def dot_test():
