@@ -21,3 +21,7 @@ LANCEDB_URI = f"{INPUT_DIR}/lancedb"
 ROOT_DIR = "./ragtest"
 CONFIG_FILE_PATH = "./ragtest/settings.yaml"
 OUTPUT_DIR = "./ragtest/prompts"
+
+# data
+DATA_INPUT_DIR = "./data/input_inputfile"
+DATA_INDEX_DIR = f"{ROOT_DIR}/input"
