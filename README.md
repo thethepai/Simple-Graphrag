@@ -77,3 +77,6 @@ For detailed usage, please check the start page in the app and refer to the micr
 
 - [ ] Query rewrite and multi session improve
   - Rewriting user queries can improve recall rates. Enhancing multi-turn conversations with reference replacement can improve user experience.
+
+- [ ] File processor about xlsx
+  - Handle multiple tables, complete missing table information, and split tables into sections in a smart way.
