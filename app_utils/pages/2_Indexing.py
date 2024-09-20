@@ -17,7 +17,7 @@ if not os.path.exists(save_folder):
 
 ragtest_input = f"{DATA_INDEX_DIR}"
 
-@st.cache
+@st.cache_data
 def get_files(uploaded_files):
     for uploaded_file in uploaded_files:
         bytes_data = uploaded_file.read()

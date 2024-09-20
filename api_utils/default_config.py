@@ -23,5 +23,5 @@ CONFIG_FILE_PATH = "./ragtest/settings.yaml"
 OUTPUT_DIR = "./ragtest/prompts"
 
 # data
-DATA_INPUT_DIR = "./data/input_inputfile"
+DATA_INPUT_DIR = "./data/input_file"
 DATA_INDEX_DIR = f"{ROOT_DIR}/input"

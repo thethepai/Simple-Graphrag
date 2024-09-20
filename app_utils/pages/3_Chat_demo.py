@@ -12,8 +12,8 @@ st.write("""start a conversation with the assistant""")
 
 pipeline = InitPipeline()
 
-if not os.path.exists(f"{pipeline.root_dir}"):
-    st.markdown("## Do the index init first and then use the chat demo")
+if not os.path.exists(f"{pipeline.root_dir}/output"):
+    st.markdown("## Do the index init and index process first and then configure the settings")
 else:
     global_engine, local_engine = pipeline.get_query_engines()
 

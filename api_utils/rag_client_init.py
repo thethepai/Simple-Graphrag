@@ -47,8 +47,7 @@ class RagClientInit:
             os.makedirs(request_index.root)
             print(f"创建了:{request_index.root}文件夹")
         else:
-            print(f"文件夹:{request_index.root}已存在，你是否已经运行过初始化了？")
-            return
+            print(f"文件夹:{request_index.root}已存在，你已经运行过初始化了")
 
         if os.path.exists(request_index.root):
             input_folder = os.path.join(request_index.root, "input")
@@ -56,6 +55,7 @@ class RagClientInit:
                 os.makedirs(input_folder)
                 print(f"创建了{input_folder}文件夹")
 
+        print(request_index)
         self.runner.run_indexing_command_default(request_index)
 
     def initialize_prompt_tune(
@@ -203,9 +203,9 @@ class InitPipeline:
 
 if __name__ == "__main__":
     pipeline = InitPipeline()
-    pipeline.default_init()
-    pipeline.default_config()
-    # pipeline.default_start_index()
+    # pipeline.default_init()
+    # pipeline.default_config()
+    pipeline.default_start_index()
     # pipeline.default_prompt_tune()
 
     # global_engine, local_engine = pipeline.get_query_engines()
