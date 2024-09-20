@@ -9,7 +9,7 @@ class DotenvManager:
         self.dotenv_path = dotenv_path
         if not os.path.exists(self.dotenv_path):
             open(self.dotenv_path, "a").close()
-            print("当前位置没有.env文件, 新创建了.env文件")
+            print("there is no .env file here, created a new one")
         load_dotenv(self.dotenv_path)
 
     def read_env(self):
@@ -36,7 +36,7 @@ class YamlManager:
         if not os.path.exists(self.yaml_path):
             with open(self.yaml_path, "w") as file:
                 yaml.dump({}, file)
-            print("当前位置没有配置文件, 新创建了配置文件")
+            print("there is no .yaml file here, created a new one")
 
     def read_yaml(self):
         with open(self.yaml_path, "r") as file:

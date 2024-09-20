@@ -45,15 +45,15 @@ class RagClientInit:
     def initialize_indexing(self, request_index: IndexingRequest = IndexingRequest()):
         if not os.path.exists(request_index.root):
             os.makedirs(request_index.root)
-            print(f"创建了:{request_index.root}文件夹")
+            print(f"created{request_index.root}folder")
         else:
-            print(f"文件夹:{request_index.root}已存在，你已经运行过初始化了")
+            print(f"folder:{request_index.root}already exsist, you have done the indexing already")
 
         if os.path.exists(request_index.root):
             input_folder = os.path.join(request_index.root, "input")
             if not os.path.exists(input_folder):
                 os.makedirs(input_folder)
-                print(f"创建了{input_folder}文件夹")
+                print(f"created{input_folder}folder")
 
         print(request_index)
         self.runner.run_indexing_command_default(request_index)
@@ -120,7 +120,7 @@ class RagClientInit:
         )
 
 
-# TODO: Asynchronous version
+# TODO: Asynchronous
 # This is a template for initializing the pipeline
 class InitPipeline:
     _instance = None
@@ -208,8 +208,8 @@ if __name__ == "__main__":
     # pipeline.default_start_index()
     # pipeline.default_prompt_tune()
 
-    global_engine, local_engine = pipeline.get_query_engines()
-    # asyncio.run(global_engine.run_search("介绍一下网络空间安全课程"))
-    # asyncio.run(local_engine.run_search("介绍一下肖凌老师"))
+    # global_engine, local_engine = pipeline.get_query_engines()
+    # asyncio.run(global_engine.run_search("query1"))
+    # asyncio.run(local_engine.run_search("query2"))
 
     print("Done")

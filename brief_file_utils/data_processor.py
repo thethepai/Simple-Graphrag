@@ -1,6 +1,6 @@
 import pandas as pd
 import os
-
+# only for csv and xlsx test
 
 class ExcelToCSVConverter:
     def __init__(self, excel_file_path, output_dir):
@@ -18,7 +18,7 @@ class ExcelToCSVConverter:
             csv_file_path = os.path.join(self.output_dir, f"{sheet_name}.csv")
             # write to csv
             df.to_csv(csv_file_path, index=False)
-            print(f"工作表 '{sheet_name}' 已保存到: {csv_file_path}")
+            print(f"sheet '{sheet_name}' stored into: {csv_file_path}")
 
 
 class CSVProcessor:
@@ -39,14 +39,14 @@ class CSVProcessor:
         for index, row in df.iterrows():
             if row[0] in days_of_week:
                 self._process_row(df, index, row)
-                # 处理下面对应位置的数字
+                # process the number below
                 next_index = index + 1
                 while next_index < len(df) and pd.isna(df.at[next_index, 0]):
                     self._process_row(df, next_index, df.iloc[next_index])
                     next_index += 1
 
         df.to_csv(file_path, index=False, header=False)
-        print(f"文件 '{file_path}' 已处理并保存")
+        print(f"file '{file_path}' stored")
 
     def _process_row(self, df, index, row):
         for col in range(1, len(row)):
@@ -69,15 +69,15 @@ class CSVToTextConverter:
             if file_name.endswith('.csv'):
                 file_path = os.path.join(self.input_dir, file_name)
                 df = pd.read_csv(file_path, header=None)
-                # 将 NaN 值替换为指定的 fill_value
+                # change NaN to fill_value
                 df.fillna(self.fill_value, inplace=True)
-                # 使用自定义分隔符 | 将 DataFrame 转换为字符串
+                # use | to separate columns
                 all_text += df.to_csv(sep=self.sep, header=False,
                                       index=False) + "\n"
 
         with open(self.output_file, 'w', encoding='utf-8') as f:
             f.write(all_text)
-        print(f"所有 CSV 文件已连接并保存到: {self.output_file}")
+        print(f"all CSV file connected and stored into: {self.output_file}")
 
 
 if __name__ == "__main__":
@@ -89,13 +89,13 @@ if __name__ == "__main__":
     if os.path.exists(excel_file_path):
         excel_converter = ExcelToCSVConverter(excel_file_path, output_dir)
         excel_converter.convert()
-        print(f"转换成功，所有工作表已保存到目录: {output_dir}")
+        print(f"all table stored into: {output_dir}")
     else:
-        print(f"文件不存在: {excel_file_path}")
+        print(f"file not exist: {excel_file_path}")
 
     csv_processor = CSVProcessor(output_dir, columns_to_process)
     csv_processor.process_csv_files()
-    print(f"所有 CSV 文件已处理并保存")
+    print(f"all CSV files processed")
 
     txt_converter = CSVToTextConverter(output_dir, result_file)
     txt_converter.convert()

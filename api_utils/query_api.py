@@ -281,11 +281,12 @@ class LocalSearchEngine:
 
 if __name__ == "__main__":
     # Example usage
-    global_search_params = GlobalSearchRequest()
-    search_engine_g = GlobalSearchEngine(global_search_params)
-    asyncio.run(search_engine_g.run_search("介绍一下网络空间安全课程"))
+    # global_search_params = GlobalSearchRequest()
+    # search_engine_g = GlobalSearchEngine(global_search_params)
+    # asyncio.run(search_engine_g.run_search("query1"))
 
     # Example usage
     # local_search_params = LocalSearchRequest()
     # search_engine_l = LocalSearchEngine(local_search_params)
-    # asyncio.run(search_engine_l.run_search("介绍一下肖凌老师"))
+    # asyncio.run(search_engine_l.run_search("query2"))
+    print("Done")
