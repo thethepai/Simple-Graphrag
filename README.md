@@ -1,6 +1,6 @@
 # 🖥️Simple-Graphrag
 
-This is a project bout **GraphRAG Index/Prompt-Tuning/Querying/Chat UI**! This initiative is an adaptation of Microsoft's [GraphRAG](https://github.com/microsoft/graphrag) core. This project features a comprehensive and interactive user interface designed to enhance your experience using graphrag.
+This is a project bout **GraphRAG Chat UI/input and configuration** This initiative is an adaptation of Microsoft's [GraphRAG](https://github.com/microsoft/graphrag) core. This project features a comprehensive and interactive user interface designed to enhance your experience using graphrag.
 
 ![Hello page](./readme_image/image_hello.png)
 
