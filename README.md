@@ -57,7 +57,7 @@ To get started with this project, please follow the instructions below:
 
     ```sh
     cd Simple-Graphrag
-    poetry run poe run_app
+    poetry run poe app_run
     ```
 
 ## 📄Documentation
